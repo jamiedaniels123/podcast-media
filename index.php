@@ -2,7 +2,7 @@
 /*========================================================================================*\
 	#	Coder    :  Ian Newton
 	#	Date     :  24th May,2011
-	#	test version  
+	#	Test version  
 	#	input controller to accept post requests from the admin server
 \*=========================================================================================*/
 
