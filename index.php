@@ -10,83 +10,55 @@ require_once("./lib/config.php");
 require_once("./lib/classes/action.class.php");
 require_once("./lib/classes/output.class.php");
 
-if ($_REQUEST!='') {
-		$data = array('status'=>'ACK', 'data'=>'Request received processing!', 'timestamp'=>time() );
-		$continue=1;
-	}else{
-		$data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
-		$continue=0;
-	}
+// $dataStream = file_get_contents("php://input");
+//	$dataStream= json_decode("php://input");
 
- echo json_encode($data);
+// print_r( urldecode($dataStream));
 
-If ($continue=1){
+if ($_GET['mess']!='') {
+
+
+// print_r(json_decode($_GET['mess']));
+	$data=json_decode($_GET['mess'],true);
+
 
 	$dataObj = new Default_Model_Action_Class();
-	$outObj = new Default_Model_Output_Class();
+//	$outObj = new Default_Model_Output_Class();
+
 	
-	if (isset($_REQUEST['status'])) {
-		$m=json_decode($_REQUEST['status']);
-		$m_dataArr = $dataObj->getStatus($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
-		
-	}else if (isset($_REQUEST['getmedia'])){
-		$m=json_decode($_REQUEST['getmedia']);
-		$m_dataArr = $dataObj->queueGetMedia($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
-		
-	}else if (isset($_REQUEST['checkfile'])){
-		$m=json_decode($_REQUEST['checkfile']);
-		$m_dataArr = $dataObj->queueCheckfile($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
-		
-	}else if (isset($_REQUEST['metadata'])){
-		$m=json_decode($_REQUEST['metadata']);
-		$m_dataArr = $dataObj->queueMetadata($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
-	
-	}else if (isset($_REQUEST['getimage'])){
-		$m=json_decode($_REQUEST['getimage']);
-		$m_dataArr = $dataObj->queueAddImage($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
-	
-	}else if (isset($_REQUEST['writerss'])){
-		$m=json_decode($_REQUEST['writerss']);
-		$m_dataArr = $dataObj->queueWriteRss($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
-	
+	if (isset($data['command'])) {
+		 if ($data['command']=='addfile'){
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+			
+			}else if ($data['command']=='checkfile'){
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				
+			}else if ($data['command']=='metadata'){
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+			
+			}else if ($data['command']=='deletefile'){
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				
+			}else if ($data['command']=='deletefolder'){
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				
+			}else if ($data['command']=='status'){
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				
+			}
+
 	}else{
-		$m['data']='';
-		$m_dataArr = $dataObj->getStatus($m['data']);
-		$m_data = $m_dataArr['resultSet'];
-		$m_rows = $m_dataArr['resultNum'];
+		$m_data = $dataObj->getStatus($data['data'],$data['number']);
 	}
 	
-	if ($m_data!='') {
-		$jsonData = json_encode($m_data);
-//	echo $jsonData;
-//	$outObj->rest_helper($adminUrl, $m_Data, 'POST', 'json');
 
-
-//		$outObj->do_post_request($adminUrl, $jsonData, $optional_headers = null);
-	}else{
-		if (isset($m['number'])) $mNumber=$m['number']; else $mNumber=0;
-		$m_data=array('command'=>'' ,'number'=>0, 'failed'=>$mNumber, 'data'=>'', 'reason'=>'Failed All!');
-	
-//		$outObj->rest_helper($adminUrl, $m_Data, 'POST', 'json');
-
-		$jsonData = json_encode($m_data);
-//	echo $jsonData;
-		
-//		$outObj->do_post_request($adminUrl, $jsonData, $optional_headers = null);
-	}
-
+}else{
+		$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 }
+
+
+		$jsonData = json_encode($m_data);
+		echo $jsonData;
+	
 
 ?>

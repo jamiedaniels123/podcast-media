@@ -27,52 +27,79 @@ class Default_Model_Action_Class
 		}
 	}
 
-	function getStatus($mArr)
+	public function getStatus($mArr,$mNum)
 	{
-		$retData= array( 'command'=>'statusreply', 'data'=>'OK') ;
-		$retNum=1;
-		if ($retData!='') $retNum=1; else $retNum=0;
-		return array ('resultSet'=>$retData, 'resultNum'=>$retNum);
+		$retData= array( 'command'=>'statusReply', 'number'=>'',  'data'=>'Logging data payload here') ;
+		$dataArr='';
+		$i=0;		while (isset($mArr[$i])){$i++;
+		}
+if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		return $retData;
 	}
 
-	function queueAddFile($mArr)
+	public function queueAction($mArr,$mNum,$action)
 	{
-		$retData= array( 'command'=>'statusreply', 'data'=>'OK') ;
-		$retNum=1;
-		if ($retData!='') $retNum=$rows; else $retNum=0;
-		return array ('resultSet'=>$retData, 'resultNum'=>$retNum);
+		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued!') ;
+		$dataArr='';
+		$i=0;		while (isset($mArr[$i])){$i++;
+		}
+if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		return $retData;
 	}
 
-	function queueCheckFile($mArr)
+
+	public function doAddFile($mArr,$mNum)
 	{
-		$retData= array( 'command'=>'statusreply', 'data'=>'OK') ;
-		$retNum=1;
-		if ($retData!='') $retNum=$rows; else $retNum=0;
-		return array ('resultSet'=>$retData, 'resultNum'=>$retNum);
+		$retData= array( 'command'=>'addfileReply', 'number'=>'', 'data'=>'Logging data payload here') ;
+		$dataArr='';
+		$i=0;		while (isset($mArr[$i])){$i++;
+		}
+if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		return $retData;
 	}
 
-	function queueMetaData($mArr)
+	public function doCheckFile($mArr,$mNum)
 	{
-		$retData= array( 'command'=>'statusreply', 'data'=>'OK') ;
-		$retNum=1;
-		if ($retData!='') $retNum=$rows; else $retNum=0;
-		return array ('resultSet'=>$retData, 'resultNum'=>$retNum);
+		$retData= array( 'command'=>'checkfileReply', 'number'=>'', 'data'=>'Logging data payload here') ;
+		$dataArr='';
+		$i=0;		while (isset($mArr[$i])){$i++;
+		}
+if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		return $retData;
 	}
 
-	function queueAddImage($mArr)
+	public function doMetaData($mArr,$mNum)
 	{
-		$retData= array( 'command'=>'statusreply', 'data'=>'OK') ;
-		$retNum=1;
-		if ($retData!='') $retNum=$rows; else $retNum=0;
-		return array ('resultSet'=>$retData, 'resultNum'=>$retNum);
+//		$mArr = $this->objectToArray($mArr);
+//	print_r($mArr);
+		$retData= array( 'command'=>'metadataReply', 'number'=>'', 'data'=>'Logging data payload here') ;
+		$dataArr='';
+		$i=0;
+		while (isset($mArr[$i])){$i++;
+		}
+		if ($retData!='') $retData['number']=$i+1; else $retData['number']=0;
+		return $retData;
 	}
 
-	function queueAddRss($mArr)
+	public function doDeleteFile($mArr,$mNum)
 	{
-		$retData= array( 'command'=>'statusreply', 'data'=>'OK') ;
-		$retNum=1;
-		if ($retData!='') $retNum=$rows; else $retNum=0;
-		return array ('resultSet'=>$retData, 'resultNum'=>$retNum);
+		$retData= array( 'command'=>'deleteFileReply', 'number'=>'', 'data'=>'Logging data payload here') ;
+		$dataArr='';
+		$i=0;
+		while (isset($mArr[$i])){$i++;
+		}
+		if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		return $retData;
+	}
+
+	public function doDeleteFolder($mArr,$mNum)
+	{
+		$retData= array( 'command'=>'deleteFolderReply', 'number'=>'', 'data'=>'Logging data payload here') ;
+		$dataArr='';
+		$i=0;		while (isset($mArr[$i])){$i++;
+		}
+if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		return $retData;
 	}
 
 }
