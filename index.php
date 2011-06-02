@@ -31,9 +31,9 @@ If ($continue=1){
 		$m_data = $m_dataArr['resultSet'];
 		$m_rows = $m_dataArr['resultNum'];
 		
-	}else if (isset($_REQUEST['addfile'])){
-		$m=json_decode($_REQUEST['addfile']);
-		$m_dataArr = $dataObj->queueAddfile($m['data']);
+	}else if (isset($_REQUEST['getmedia'])){
+		$m=json_decode($_REQUEST['getmedia']);
+		$m_dataArr = $dataObj->queueGetMedia($m['data']);
 		$m_data = $m_dataArr['resultSet'];
 		$m_rows = $m_dataArr['resultNum'];
 		
@@ -49,15 +49,15 @@ If ($continue=1){
 		$m_data = $m_dataArr['resultSet'];
 		$m_rows = $m_dataArr['resultNum'];
 	
-	}else if (isset($_REQUEST['image'])){
-		$m=json_decode($_REQUEST['image']);
+	}else if (isset($_REQUEST['getimage'])){
+		$m=json_decode($_REQUEST['getimage']);
 		$m_dataArr = $dataObj->queueAddImage($m['data']);
 		$m_data = $m_dataArr['resultSet'];
 		$m_rows = $m_dataArr['resultNum'];
 	
-	}else if (isset($_REQUEST['rssfile'])){
-		$m=json_decode($_REQUEST['rssfile']);
-		$m_dataArr = $dataObj->queueAddRss($m['data']);
+	}else if (isset($_REQUEST['writerss'])){
+		$m=json_decode($_REQUEST['writerss']);
+		$m_dataArr = $dataObj->queueWriteRss($m['data']);
 		$m_data = $m_dataArr['resultSet'];
 		$m_rows = $m_dataArr['resultNum'];
 	
