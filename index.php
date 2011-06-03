@@ -10,23 +10,21 @@ require_once("./lib/config.php");
 require_once("./lib/classes/action.class.php");
 require_once("./lib/classes/output.class.php");
 
-// $dataStream = file_get_contents("php://input");
-//	$dataStream= json_decode("php://input");
+$dataStream = file_get_contents("php://input");
 
-// print_r( urldecode($dataStream));
+$dataMess=explode('=',urldecode($dataStream));
+// print_r($dataMess[1]);
 
-if ($_GET['mess']!='') {
+if ($dataMess[1]!='') {
 
-
-// print_r(json_decode($_GET['mess']));
-	$data=json_decode($_GET['mess'],true);
-
+	$data=json_decode($dataMess[1],true);
+//print_r($data);
 
 	$dataObj = new Default_Model_Action_Class();
 //	$outObj = new Default_Model_Output_Class();
-
 	
 	if (isset($data['command'])) {
+
 		 if ($data['command']=='addfile'){
 				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
 			
@@ -43,7 +41,7 @@ if ($_GET['mess']!='') {
 				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
 				
 			}else if ($data['command']=='status'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				$m_data = $dataObj->getStatus($data['data'],$data['number'],$data['command']);
 				
 			}
 
@@ -53,12 +51,11 @@ if ($_GET['mess']!='') {
 	
 
 }else{
-		$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
+	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 }
 
-
-		$jsonData = json_encode($m_data);
-		echo $jsonData;
+$jsonData = json_encode($m_data);
+echo $jsonData;
 	
 
 ?>

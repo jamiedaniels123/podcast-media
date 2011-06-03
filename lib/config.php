@@ -11,15 +11,15 @@
 
 //___DB CONNECTION_________________________________________________________________________________//
 
-//		$HOSTNAME = "localhost";		// DB server name
-//		$DATABASE = "mediaserver";				// DB name
-//		$USERNAME = "admin";				// DB user login name
-//		$PASSWORD = "g833nf80g";		// DB password
+		$HOSTNAME = "localhost";		// DB server name
+		$DATABASE = "podcast_media";				// DB name
+		$USERNAME = "pm_user";				// DB user login name
+		$PASSWORD = "y3ll0wp1g";		// DB password
 
 //___DB SCRIPT_____________________________________________________________________________________//
 
-//		$db_connect = mysql_connect($HOSTNAME, $USERNAME, $PASSWORD) or DIE(mysql_error());
-//		mysql_select_db($DATABASE, $db_connect);
+		$db_connect = mysql_connect($HOSTNAME, $USERNAME, $PASSWORD) or DIE(mysql_error());
+		mysql_select_db($DATABASE, $db_connect);
 //_________________________________________________________________________________________________//
 		
 
