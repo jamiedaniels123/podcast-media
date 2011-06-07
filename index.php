@@ -26,19 +26,19 @@ if ($dataMess[1]!='') {
 	if (isset($data['command'])) {
 
 		 if ($data['command']=='addfile'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 			
 			}else if ($data['command']=='metadata'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 			
 			}else if ($data['command']=='deletefile'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 				
 			}else if ($data['command']=='deletefolder'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command']);
+				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 				
 			}else if ($data['command']=='checkfile'){
-				$m_data = $dataObj->doCheckFile($data['data'],$data['number']);
+				$m_data = $dataObj->doCheckFile($data['data'],$data['number'],$data['timestamp']);
 				
 			}else if ($data['command']=='status'){
 				$m_data = $dataObj->getStatus($data['data'],$data['number'],$data['command']);

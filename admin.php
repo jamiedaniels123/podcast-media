@@ -14,7 +14,7 @@ $outObj = new Default_Model_Output_Class();
 
 if (isset($_REQUEST['action_select'])) {
 	
-	if ($_REQUEST['action_select'] == 'addfile') {
+	if ($_REQUEST['action_select'] == 'processfile') {
 		$fdata[]= array('custom_id'=>'', 'fname'=>'firstfile.m4v', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
 		$fdata[]= array('custom_id'=>'', 'fname'=>'secondfile.m4v', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
 		$postData=array(	'command'=>'addfile' ,'number'=>1,'data'=>$fdata,'timestamp'=>time());
@@ -32,6 +32,7 @@ if (isset($_REQUEST['action_select'])) {
 
 	}else if ($_REQUEST['action_select'] == 'metadata'){
 		$fdata[]= array('custom_id'=>'', 
+		'folder'=>'/', 
 		'fname'=>'firstfile.mp4', 
 		'account'=>'The account', 
 		'author'=>'The author', 
@@ -45,6 +46,7 @@ if (isset($_REQUEST['action_select'])) {
 		'type'=>'the data type', 
 		'count'=>'1');
 		$fdata[]= array('custom_id'=>'', 
+		'folder'=>'/', 
 		'fname'=>'firstfile.mp4', 
 		'account'=>'The account', 
 		'author'=>'The author', 
@@ -58,6 +60,7 @@ if (isset($_REQUEST['action_select'])) {
 		'type'=>'the data type', 
 		'count'=>'2');
 		$fdata[]= array('custom_id'=>'', 
+		'folder'=>'/', 
 		'fname'=>'firstfile.mp4', 
 		'account'=>'The account', 
 		'author'=>'The author', 
@@ -71,6 +74,7 @@ if (isset($_REQUEST['action_select'])) {
 		'type'=>'the data type', 
 		'count'=>'3');
 		$fdata[]= array('custom_id'=>'', 
+		'folder'=>'/', 
 		'fname'=>'firstfile.mp4', 
 		'account'=>'The account', 
 		'author'=>'The author', 
@@ -142,7 +146,7 @@ echo "<br /><br /><b>Returns: </b>";
  <select name="action_select" onchange="javascript:submitform();">
  <option value="">Select action ...</option>
  <option value="">Status</option>
- <option value="addfile">C - Add file(s)</option>
+ <option value="processfile">C - Process file(s)</option>
  <option value="checkfile">R - Check file(s)</option>
  <option value="metadata">U - Write Meta Data</option>
  <option value="deletefile">D - Delete File(s)</option>

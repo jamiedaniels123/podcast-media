@@ -78,7 +78,7 @@ class Default_Model_Action_Class
 
 	public function getStatus($mArr,$mNum,$mCommand)
 	{
-		$retData= array( 'command'=>'statusReply', 'number'=>'',  'data'=>'Logging data payload here') ;
+		$retData= array( 'command'=>'statusReply', 'number'=>'',  'data'=>'') ;
 		$dataArr='';		$i=0;		
 		while (isset($mArr[$i])){
 			
@@ -89,7 +89,7 @@ class Default_Model_Action_Class
 	}
 
 
-	public function queueAction($mArr,$mNum,$action)
+	public function queueAction($mArr,$mNum,$action,$timestamp)
 	{
 		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued!') ;
 		$dataArr='';		$i=0;		
@@ -98,7 +98,7 @@ class Default_Model_Action_Class
 			while (isset($mArr[$i])){
 // print_r($mArr[$i]);
 				if($i!=0) $sqlQuery.= ", ";
-				$sqlQuery.= "('".$action."','".serialize($mArr[$i])."',NOW(), '', 'N')"; 
+				$sqlQuery.= "('".$action."','".serialize($mArr[$i])."','".$timestamp."', '', 'N')"; 
 				$i++;
 			}
 //	echo $sqlQuery;
@@ -108,12 +108,12 @@ class Default_Model_Action_Class
 	}
 
 
-	public function doAddFile($mArr,$mNum)
+	public function doProcessFile($mArr,$mNum)
 	{
 		$retData= array( 'command'=>'addfileReply', 'number'=>'', 'data'=>'Logging data payload here') ;
 		$dataArr='';		$i=0;		
 		while (isset($mArr[$i])){
-			
+			print_r($mArr[$i]);
 			$i++;
 		}
 		if ($retData!='') $retData['number']=$i; else $retData['number']=0;
@@ -125,10 +125,10 @@ class Default_Model_Action_Class
 		$retData= array( 'command'=>'checkfileReply', 'number'=>'', 'data'=>'Logging data payload here') ;
 		$dataArr='';		$i=0;		
 		while (isset($mArr[$i])){
-			
+			print_r($mArr[$i]);
 			$i++;
 		}
-		if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		if ($retData!='') $retData['number']=$i; else $retData['number']=0; 
 		return $retData;
 	}
 
@@ -139,7 +139,7 @@ class Default_Model_Action_Class
 		$retData= array( 'command'=>'metadataReply', 'number'=>'', 'data'=>'Logging data payload here') ;
 		$dataArr='';		$i=0;		
 		while (isset($mArr[$i])){
-			
+			print_r($mArr[$i]);
 			$i++;
 		}
 		if ($retData!='') $retData['number']=$i+1; else $retData['number']=0;
@@ -151,9 +151,7 @@ class Default_Model_Action_Class
 		$retData= array( 'command'=>'deleteFileReply', 'number'=>'', 'data'=>'Logging data payload here') ;
 		$dataArr='';		$i=0;		
 		while (isset($mArr[$i])){
-
-
-			
+			print_r($mArr[$i]);
 			$i++;
 		}
 if ($retData!='') $retData['number']=$i; else $retData['number']=0;
@@ -162,13 +160,12 @@ if ($retData!='') $retData['number']=$i; else $retData['number']=0;
 
 	public function doDeleteFolder($mArr,$mNum)
 	{
-		$retData= array( 'command'=>'deleteFolderReply', 'number'=>'', 'data'=>'Logging data payload here') ;
 		$dataArr='';		$i=0;		
 		while (isset($mArr[$i])){
-			
+			print_r($mArr[$i]);
 			$i++;
 		}
-if ($retData!='') $retData['number']=$i; else $retData['number']=0;
+		$retData= array( 'command'=>'deleteFolderReply', 'number'=>$i, 'data'=>$mArr[$i]) ;
 		return $retData;
 	}
 
