@@ -17,33 +17,33 @@ require_once("./lib/classes/output.class.php");
 
 // Get the actions from the queue table
 
-	$sqlQuery = "SELECT * FROM media_actions AS ma where ma.ma_status = 'N' ORDER BY ma.ma_command";
-	echo $sqlQuery;
+	$sqlQuery = "SELECT * FROM command_queue AS cq where cq.cq_status = 'N' ORDER BY cq.cq_command";
+//	echo $sqlQuery;
 	$res = mysql_query($sqlQuery);
 	
 // Process the outstanding actions 
 
 	while($actObj=mysql_fetch_object($res)) { 
 	
-		if ($actObj->ma_command=='processfile'){
-			$pfi_data[]= unserialize($actObj->ma_data);
-			$pfi_data['row']= $actObj->ma_index;
+		if ($actObj->cq_command=='processfile'){
+			$pfi_data[]= unserialize($actObj->cq_data);
+			$pfi_data['row']= $actObj->cq_index;
 				
-		}else if ($actObj->ma_command=='checkfile'){
-			$cfi_data[]= unserialize($actObj->ma_data);
-			$pfi_data['row']= $actObj->ma_index;
+		}else if ($actObj->cq_command=='checkfile'){
+			$cfi_data[]= unserialize($actObj->cq_data);
+			$pfi_data['row']= $actObj->cq_index;
 
-		}else if ($actObj->ma_command=='metadata'){
-			$mfi_data[]= unserialize($actObj->ma_data);
-			$pfi_data['row']= $actObj->ma_index;
+		}else if ($actObj->cq_command=='metadata'){
+			$mfi_data[]= unserialize($actObj->cq_data);
+			$pfi_data['row']= $actObj->cq_index;
 
-		}else if ($actObj->ma_command=='deletefile'){
-			$pfi_data[]= unserialize($actObj->ma_data);
-			$pfi_data['row']= $actObj->ma_index;
+		}else if ($actObj->cq_command=='deletefile'){
+			$pfi_data[]= unserialize($actObj->cq_data);
+			$pfi_data['row']= $actObj->cq_index;
 			
-		}else if ($actObj->ma_command=='deletefolder'){
-			$pfo_data[]= unserialize($actObj->ma_data);
-			$pfi_data['row']= $actObj->ma_index;
+		}else if ($actObj->cq_command=='deletefolder'){
+			$pfo_data[]= unserialize($actObj->cq_data);
+			$pfi_data['row']= $actObj->cq_index;
 
 		}
 	}
@@ -51,23 +51,23 @@ require_once("./lib/classes/output.class.php");
 		if (isset($pfi_data)){
 				
 			$m_data = $dataObj->doProcessFile($pfi_data, count($pfi_data));
-			$result=$outObj->message_send($action, $adminUrl, $m_data['data'], $m_data['number']);
+			$result=$outObj->message_send('processfile', $adminUrl, $m_data['data'], $m_data['number']);
 				
 		}if (isset($cfi_data)){
 			$m_data = $dataObj->doCheckFile($cfi_data, count($cfi_data));
-			$result=$outObj->message_send($action, $adminUrl, $m_data['data'], $m_data['number']);
+			$result=$outObj->message_send('checkfile', $adminUrl, $m_data['data'], $m_data['number']);
 			
 		}if (isset($mfi_data)){
 			$m_data = $dataObj->doMetaData($mfi_data, count($mfi_data));
-			$result=$outObj->message_send($action, $adminUrl, $m_data['data'], $m_data['number']);
+			$result=$outObj->message_send('metadata', $adminUrl, $m_data['data'], $m_data['number']);
 		
 		}if (isset($dfi_data)){
 			$m_data = $dataObj->doDeleteFile($dfi_data, count($dfi_data));
-			$result=$outObj->message_send($action, $adminUrl, $m_data['data'], $m_data['number']);
+			$result=$outObj->message_send('deletefile', $adminUrl, $m_data['data'], $m_data['number']);
 			
 		}if (isset($dfo_data)){
 			$m_data = $dataObj->doDeleteFolder($dfo_data, count($dfo_data));
-			$result=$outObj->message_send($action, $adminUrl, $m_data['data'], $m_data['number']);
+			$result=$outObj->message_send('deletefolder', $adminUrl, $m_data['data'], $m_data['number']);
 		}
 
 

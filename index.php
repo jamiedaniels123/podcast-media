@@ -20,12 +20,13 @@ if ($dataMess[1]!='') {
 	$data=json_decode($dataMess[1],true);
 //print_r($data);
 
-	$dataObj = new Default_Model_Action_Class();
-//	$outObj = new Default_Model_Output_Class();
+	$mysqli = new mysqli($dbhost, $dbusername, $dbuserpass, $dbname);
+
+	$dataObj = new Default_Model_Action_Class($mysqli);
 	
 	if (isset($data['command'])) {
 
-		 if ($data['command']=='addfile'){
+		 if ($data['command']=='processfile'){
 				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 			
 			}else if ($data['command']=='metadata'){

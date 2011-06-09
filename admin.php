@@ -136,6 +136,8 @@ function submitform()
 
 <body>
 <?PHP 
+echo "<b>Source: </b>".$adminUrl."<br /><br />";
+echo "<b>Destination: </b>".$mediaUrl."<br /><br />";
 echo "<b>Command: </b>".$action."<br /><br /><b>Sending: </b>";
 print_r(json_encode($fdata));
 echo "<br /><br /><b>Returns: </b>";
@@ -154,5 +156,6 @@ echo "<br /><br /><b>Returns: </b>";
  </select>
  
  </form>
+ <?PHP // phpinfo(); ?>
 </body>
 </html>

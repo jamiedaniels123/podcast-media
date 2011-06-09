@@ -10,7 +10,7 @@ class Default_Model_Action_Class
  {
 	
 	/**  * Constructor  */
-	function Default_Model_Action_Class(){}
+    function Default_Model_Action_Class($mysqli){}  
 
 // ------ User stuff
 
@@ -26,7 +26,7 @@ class Default_Model_Action_Class
 			return $d;
 		}
 	}
-
+	   
 	function delTree($dir) {
 		$files = glob( $dir . '*', GLOB_MARK );
 		foreach( $files as $file ){
@@ -88,21 +88,24 @@ class Default_Model_Action_Class
 		return $retData;
 	}
 
-
 	public function queueAction($mArr,$mNum,$action,$timestamp)
 	{
+		global $mysqli;
+
+		
 		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued!') ;
-		$dataArr='';		$i=0;		
-			$sqlQuery = "INSERT INTO `media_actions` (`ma_command`, `ma_data`, `ma_time`, `ma_update`,`ma_status`) VALUES ";
-			$i=0;
-			while (isset($mArr[$i])){
-// print_r($mArr[$i]);
-				if($i!=0) $sqlQuery.= ", ";
-				$sqlQuery.= "('".$action."','".serialize($mArr[$i])."','".$timestamp."', '', 'N')"; 
-				$i++;
-			}
+		$dataArr='';		
+		$i=0;		
+		$sqlQuery = "INSERT INTO `command_queue` (`cq_command`, `cq_data`, `cq_time`, `cq_update`,`cq_status`) VALUES ";
+		$i=0;
+		while (isset($mArr[$i])){
+			if($i!=0) $sqlQuery.= ", ";
+			$sqlQuery.= "('".$action."','".serialize($mArr[$i])."','".$timestamp."', '', 'N')"; 
+			$i++;
+		}
 //	echo $sqlQuery;
-		mysql_query($sqlQuery);
+		$result = $mysqli->query($sqlQuery);
+		$error = $mysqli->info;
 		if ($retData!='') $retData['number']=$i; else $retData['number']=0;
 		return $retData;
 	}

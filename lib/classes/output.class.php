@@ -27,7 +27,7 @@ class Default_Model_Output_Class
 	}
 
 	function message_send($command, $mediaUrl, $data, $number){
-		$postData=array(	'command'=>$command ,'number'=>$number ,'data'=>$data,'timestamp'=>time());
+		$postData=array(	'command'=>$command, 'number'=>$number, 'data'=>$data, 'timestamp'=>time());
 //		print_r($postData);
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');

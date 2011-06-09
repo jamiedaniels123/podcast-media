@@ -1,4 +1,4 @@
-<?
+<?PHP
 /*========================================================================================*\
 	#	Coder    :  Ian Newton
 	#	Date     :  25th May,2011
@@ -11,16 +11,12 @@
 
 //___DB CONNECTION_________________________________________________________________________________//
 
-		$HOSTNAME = "localhost";		// DB server name
-		$DATABASE = "podcast_media";				// DB name
-		$USERNAME = "pm_user";				// DB user login name
-		$PASSWORD = "y3ll0wp1g";		// DB password
+$dbLogin = array ('dbhost' => "localhost", 'dbname' => "admin-api", 'dbusername' => "podcastapi", 'dbuserpass' => "CZJ5SWw2TBWueBmp");
 
-//___DB SCRIPT_____________________________________________________________________________________//
+//$dbLogin = array ('dbhost' => "localhost", 'dbname' => "podcast_media", 'dbusername' => "pm_user", 'dbuserpass' => "y3ll0wp1g");
 
-		$db_connect = mysql_connect($HOSTNAME, $USERNAME, $PASSWORD) or DIE(mysql_error());
-		mysql_select_db($DATABASE, $db_connect);
 //_________________________________________________________________________________________________//
+		
 		
 
 //		$adminUrl="http://podcast-admin-dev.open.ac.uk/";
