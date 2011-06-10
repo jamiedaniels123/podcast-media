@@ -1,0 +1,65 @@
+<?
+/*========================================================================================*\
+	#	Coder    :  Ian Newton
+	#	Date     :  25th May,2011
+	#	Test version  
+/*========================================================================================*/
+
+//___Debug_________________________________________________________________________________________//
+
+//	ini_set(display_errors,On);
+
+//___DB CONNECTION_________________________________________________________________________________//
+
+$dbLogin = array ('dbhost' => "localhost", 'dbname' => "admin_api", 'dbusername' => "podcastapi", 'dbuserpass' => "CZJ5SWw2TBWueBmp");
+
+//$dbLogin = array ('dbhost' => "localhost", 'dbname' => "podcast_media", 'dbusername' => "pm_user", 'dbuserpass' => "y3ll0wp1g");
+
+//_________________________________________________________________________________________________//
+		
+		$adminUrl="http://localhost/api-admin/admin.php";
+		$mediaUrl="http://localhost/api-admin/";
+//		$mediaUrl="http://podcast-api-dev.open.ac.uk/";
+
+//		define ('FILE_ROOT', "/......."); 		
+		$FILE_ROOT = "/vhosts/httpdocs";
+		$pageURL = 'http';
+//		if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";} 
+		$pageURL .= "://";
+		if ($_SERVER["SERVER_PORT"] != "80") {
+			$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+		} else {
+			$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+		}
+		$page_urlArr = explode('&pn=',$pageURL);
+		$page_url = $page_urlArr[0];
+		$rootdir = "$FILE_ROOT/aw_root";
+		$ADMIN_ROOT = "$FILE_ROOT/admin";
+		$list_length = 30; // Adjusts all paged lists rows per page
+		$PATH_ADMIN				= "$ADMIN_ROOT/";
+		$PATH_ADMIN_INCLUDES 	= "$ADMIN_ROOT/includes/";
+			
+		$EMAIL_FROM_NAME		= "admin";
+		$EMAIL_FROM_ADDR		= "info@this.com";
+
+//___Session_init__________________________________________________________________________________//
+
+		
+		define ('TIME_OFFSET', "3600"); // Summer time offset
+		$base_url = "http://".$_SERVER['HTTP_HOST']."/";
+//		$logoutPlace = "http://".$_SERVER['HTTP_HOST']."?logout=1&timeout=1";
+		$msg = "";
+/*		if (isset($_REQUEST['logout'])){
+			unset($login);
+			session_unregister("id_user");
+			session_unregister("org_id");
+			session_unregister("set");
+			$page = "home";
+			if (isset($_REQUEST['timeout']) && $_REQUEST['timeout']==1) $msg= "Inactivity logout - 600 mins";
+		}
+		if (isset($_REQUEST['login'])){
+			$page = "home";
+		}
+		if (!isset($styleNo)) $styleNo = NULL;	
+*/
+?>
