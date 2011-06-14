@@ -138,7 +138,7 @@ if (isset($_REQUEST['action_select'])) {
 	$number=1;
 }
 
-
+// echo $mediaUrl;
 	$result=$outObj->message_send($action, $mediaUrl, $fdata, $number);
 
 ?>

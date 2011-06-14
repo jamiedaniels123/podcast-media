@@ -7,7 +7,7 @@
 \*=========================================================================================*/
 
 require_once("./lib/config.php");
-require_once("./lib/classes/action.class.php");
+require_once("./lib/classes/action-admin.class.php");
 require_once("./lib/classes/output.class.php");
 
 $dataStream = file_get_contents("php://input");
@@ -24,7 +24,7 @@ if ($dataMess[1]!='') {
 
 	$outObj = new Default_Model_Output_Class();
 
-	$dataObj = new Default_Model_Action_Class($mysqli,$outObj);	
+	$dataObj = new Default_Model_Action_Class($mysqli);	
 
 	$sqlQuery = "SELECT * FROM command_routes AS cr where cr.cr_action = '".$data['command']."'";
 
@@ -34,19 +34,15 @@ if ($dataMess[1]!='') {
 	
 	if ($result->num_rows) {
 
-		if ($row->cr_route_type=='queue'){
-			$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-		
-		}else if ($row->cr_route_type=='direct'){
-			$m_data = $dataObj->directAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-		
-		}
+		$m_data0 = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
+
+// echo $data['command'].", ".$mediaUrl.", ".$data['data'].", ".$data['number'];
+		$m_data1=$outObj->message_send($data['command'], $mediaUrl, $data['data'], $data['number']);
 
 	}else{
 		$m_data = array('status'=>'NACK', 'data'=>'Command not known!', 'timestamp'=>time());
 
 	}
-	
 
 }else{
 	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
