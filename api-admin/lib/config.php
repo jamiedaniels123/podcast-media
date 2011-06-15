@@ -13,11 +13,8 @@
 
 $dbLogin = array ('dbhost' => "localhost", 'dbname' => "admin-api", 'dbusername' => "podcastapi", 'dbuserpass' => "CZJ5SWw2TBWueBmp");
 
-//_________________________________________________________________________________________________//
+//___TIME ZONE_________________________________________________________________________________//
 
-		$adminUrl="http://podcast-admin-dev.open.ac.uk/admin.php";
-//		$adminUrl="http://localhost/admin.php";
-		$mediaUrl="http://podcast-admin-dev.open.ac.uk/";
-//		$mediaUrl="http://localhost/";
+date_default_timezone_set("Europe/London");
 
 ?>

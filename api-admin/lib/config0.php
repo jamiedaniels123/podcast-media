@@ -14,7 +14,9 @@
 $dbLogin = array ('dbhost' => "localhost", 'dbname' => "admin_api", 'dbusername' => "podcastapi", 'dbuserpass' => "CZJ5SWw2TBWueBmp");
 
 
-//_________________________________________________________________________________________________//
+//___TIME ZONE_________________________________________________________________________________//
+
+date_default_timezone_set("Europe/London");
 		
 //		$adminUrl="http://localhost/api-admin/admin.php";
 		$adminUrl="http://podcast-api-dev.open.ac.uk/admin.php";

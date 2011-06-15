@@ -43,7 +43,7 @@ class Default_Model_Action_Class
 	{
 		global $mysqli;
 
-		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued!') ;
+		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued admin-api!') ;
 		$dataArr='';	
 		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_time_start`) VALUES ( '".$action."', '".date("Y-m-d H:i:s", $timestamp)."' )";
 //	echo $sqlMessages;

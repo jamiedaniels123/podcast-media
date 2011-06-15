@@ -6,9 +6,9 @@
 	#	input controller to accept post requests from the admin server
 \*=========================================================================================*/
 
-require_once("../lib/config.php");
-require_once("../lib/classes/action.class.php");
-require_once("../lib/classes/output.class.php");
+require_once("./lib/config.php");
+require_once("./lib/classes/action-encoder.class.php");
+require_once("./lib/classes/output.class.php");
 
 $dataStream = file_get_contents("php://input");
 
@@ -20,43 +20,41 @@ if ($dataMess[1]!='') {
 	$data=json_decode($dataMess[1],true);
 //print_r($data);
 
-	$mysqli = new mysqli($dbhost, $dbusername, $dbuserpass, $dbname);
+	$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
 
-	$dataObj = new Default_Model_Action_Class($mysqli);
+	$outObj = new Default_Model_Output_Class();
+
+	$dataObj = new Default_Model_Action_Class($mysqli,$outObj);	
+
+	$sqlQuery = "SELECT * FROM command_routes AS cr where cr.cr_action = '".$data['command']."'";
+
+// echo 	$sqlQuery;
+	$result = $mysqli->query($sqlQuery);
+	$row = $result->fetch_object();
 	
-	if (isset($data['command'])) {
+	if ($result->num_rows) {
 
-		 if ($data['command']=='processfile'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-			
-			}else if ($data['command']=='metadata'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-			
-			}else if ($data['command']=='deletefile'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-				
-			}else if ($data['command']=='deletefolder'){
-				$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-				
-			}else if ($data['command']=='checkfile'){
-				$m_data = $dataObj->doCheckFile($data['data'],$data['number'],$data['timestamp']);
-				
-			}else if ($data['command']=='status'){
-				$m_data = $dataObj->getStatus($data['data'],$data['number'],$data['command']);
-				
-			}
+		if ($row->cr_route_type=='queue'){
+			$m_data = $dataObj->queueAction($data['data'], $data['number'], $data['command'], $data['timestamp']);
+//			$m_data = array('status'=>'ACK', 'data'=>'Queue action requested', 'timestamp'=>time());
+		
+		}else if ($row->cr_route_type=='direct'){
+			$m_data = $dataObj->directAction($data['data'], $data['number'], $data['command'], $row->cr_function, $data['timestamp']);
+//			$m_data = array('status'=>'ACK', 'data'=>'Direct action requested', 'timestamp'=>time());
+		
+		}
 
 	}else{
-		$m_data = $dataObj->getStatus($data['data'],$data['number']);
+		$m_data = array('status'=>'NACK', 'data'=>'Command not known!', 'timestamp'=>time());
+
 	}
-	
 
 }else{
 	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
+
 }
 
 $jsonData = json_encode($m_data);
 echo $jsonData;
-	
 
 ?>

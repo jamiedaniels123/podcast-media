@@ -68,8 +68,8 @@ class Default_Model_Output_Class
 		
 		switch ($format) {
 		case 'json':
-		$r=$res;
-// 		  $r = json_decode($res,true);
+//		$r=$res;
+ 		  $r = json_decode($res,true);
 
 		  if ($r === null) {
 			throw new Exception("failed to decode $res as json");

@@ -14,9 +14,9 @@ $outObj = new Default_Model_Output_Class();
 if (isset($_REQUEST['action_select'])) {
 	
 	if ($_REQUEST['action_select'] == 'transcode-media') {
-		$fdata[]= array('custom_id'=>'', 'fname'=>'firstfile.m4v', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
-		$fdata[]= array('custom_id'=>'', 'fname'=>'secondfile.m4v', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
-		$number=2;
+		$fdata[]= array('custom_id'=>'', 'infile'=>'BSG_4.2.avi', 'outfile'=>'BSG_4.2.avi', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
+//		$fdata[]= array('custom_id'=>'', 'infile'=>'1443_test/1300469084.wmv', 'outfile'=>'1300469084.wmv', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
+		$number=1;
 		$action=$_REQUEST['action_select'];
 
 	}else if ($_REQUEST['action_select'] == 'transcode-media-and-deliver'){
@@ -39,14 +39,19 @@ if (isset($_REQUEST['action_select'])) {
 		$number=4;
 		$action=$_REQUEST['action_select'];
 		
-	}else if ($_REQUEST['action_select'] == 'checkfile'){
-		$fdata[]= array('custom_id'=>'', 'fname'=>'firstfile.mp4', 'count'=>'1');
-		$fdata[]= array('custom_id'=>'', 'fname'=>'secondfile.mp4', 'count'=>'2');
-		$fdata[]= array('custom_id'=>'', 'fname'=>'thirdfile.mp4', 'count'=>'3');
-		$fdata[]= array('custom_id'=>'', 'fname'=>'fourthfile.mp4', 'count'=>'4');
+	}else if ($_REQUEST['action_select'] == 'check-file-exists'){
+		$fdata[]= array('custom_id'=>'', 'collectionpath'=>'amediacollectionpath', 'fname'=>'firstfile.mp4', 'count'=>'1');
+		$fdata[]= array('custom_id'=>'', 'collectionpath'=>'amediacollectionpath', 'fname'=>'secondfile.mp4', 'count'=>'2');
+		$fdata[]= array('custom_id'=>'', 'collectionpath'=>'amediacollectionpath', 'fname'=>'thirdfile.mp4', 'count'=>'3');
+		$fdata[]= array('custom_id'=>'', 'collectionpath'=>'amediacollectionpath', 'fname'=>'fourthfile.mp4', 'count'=>'4');
 		$number=4;
 		$action=$_REQUEST['action_select'];
 		
+	}else if ($_REQUEST['action_select'] == 'check-folder-exists'){
+		$fdata[]= array('custom_id'=>'', 'collectionpath'=>'amediacollectionpath', 'count'=>'1');
+		$number=1;
+		$action=$_REQUEST['action_select'];
+
 	}else if ($_REQUEST['action_select'] == 'update-file-metadata'){
 		$fdata[]= array('custom_id'=>'', 
 		'folder'=>'/', 
@@ -164,7 +169,7 @@ echo "<b>Destination: </b>".$mediaUrl."<br /><br />";
 echo "<b>Command: </b>".$action."<br /><br /><b>Sending: </b>";
 print_r(json_encode($fdata));
 echo "<br /><br /><b>Returns: </b>";
- if (isset($result)) print_r ($result);?>
+ if (isset($result)) print_r (json_encode($result));?>
 <br /><br /> 
  <form action="" method="post" enctype="application/x-www-form-urlencoded" name="action" id="action">
  
@@ -179,9 +184,9 @@ echo "<br /><br /><b>Returns: </b>";
  <option value="delete-folder-on-media-server">D - Delete-folder-on-media-server</option>
  <option value="update-file-metadata">U - Update-file(s)-metadata</option>
  <option value="update-folder-metadata">U - Update-folder-metadata</option>
- <option value="set-permissions-folder">R - Set-permissions-folder</option>
- <option value="check-file-exists">D - Check-file(s)-exists</option>
- <option value="check-folder-exists">D - Check-folder-exists</option>
+ <option value="set-permissions-folder">R - Set-permissions-folder (media-server)</option>
+ <option value="check-file-exists">D - Check-file(s)-exists (media-server)</option>
+ <option value="check-folder-exists">D - Check-folder-exists (media-server)</option>
  </select>
  
  </form>

@@ -7,61 +7,35 @@
 
 //___Debug_________________________________________________________________________________________//
 
-//	ini_set(display_errors,On);
+	ini_set(display_errors,On);
 
 //___DB CONNECTION_________________________________________________________________________________//
 
-$dbLogin = array ('dbhost' => "localhost", 'dbname' => "admin-api", 'dbusername' => "podcastapi", 'dbuserpass' => "CZJ5SWw2TBWueBmp");
+$dbLogin = array ('dbhost' => "localhost", 'dbname' => "encoder-api", 'dbusername' => "in625", 'dbuserpass' => "ge5HUQes");
 
-//$dbLogin = array ('dbhost' => "localhost", 'dbname' => "podcast_media", 'dbusername' => "pm_user", 'dbuserpass' => "y3ll0wp1g");
+//___TIME ZONE_________________________________________________________________________________//
 
-//_________________________________________________________________________________________________//
-		
-		
+date_default_timezone_set("Europe/London");
 
-//		$adminUrl="http://podcast-admin-dev.open.ac.uk/";
-		$adminUrl="http://localhost/admin.php";
-		$mediaUrl="http://localhost/";
+//____SCP SOURCE/DESTINATIONS_________________________________________________________________//
 
-//		define ('FILE_ROOT', "/......."); 		
-		$FILE_ROOT = "/vhosts/httpdocs";
-		$pageURL = 'http';
-//		if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";} 
-		$pageURL .= "://";
-		if ($_SERVER["SERVER_PORT"] != "80") {
-			$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-		} else {
-			$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
-		}
-		$page_urlArr = explode('&pn=',$pageURL);
-		$page_url = $page_urlArr[0];
-		$rootdir = "$FILE_ROOT/aw_root";
-		$ADMIN_ROOT = "$FILE_ROOT/admin";
-		$list_length = 30; // Adjusts all paged lists rows per page
-		$PATH_ADMIN				= "$ADMIN_ROOT/";
-		$PATH_ADMIN_INCLUDES 	= "$ADMIN_ROOT/includes/";
-			
-		$EMAIL_FROM_NAME		= "admin";
-		$EMAIL_FROM_ADDR		= "info@this.com";
+  $source = array(
+  	'admin' => 'admin-transfer-dev@podcast-api-dev.open.ac.uk:/data/web/podcast-api-dev.open.ac.uk/file-transfer/source/',
+  	'media' => 'media-transfer-dev@media-podcast-api-dev.open.ac.uk:/data/web/media-podcast-api-dev.open.ac.uk/file-transfer/source/',
+  	'encoder' => '/Volumes/Data/Episode/EpisodeEngine/Outputs/'
+  );
+  
+  $destination = array(
+  	'admin' => 'admin-transfer-dev@podcast-api-dev.open.ac.uk:/data/web/podcast-api-dev.open.ac.uk/file-transfer/destination/',
+  	'media' => 'media-transfer-dev@media-podcast-api-dev.open.ac.uk:/data/web/media-podcast-api-dev.open.ac.uk/file-transfer/destination/',
+  	'encoder' => '/Volumes/Data/Episode/EpisodeEngine/Inputs/'
+  );
 
-//___Session_init__________________________________________________________________________________//
 
-		
-		define ('TIME_OFFSET', "3600"); // Summer time offset
-		$base_url = "http://".$_SERVER['HTTP_HOST']."/";
-//		$logoutPlace = "http://".$_SERVER['HTTP_HOST']."?logout=1&timeout=1";
-		$msg = "";
-/*		if (isset($_REQUEST['logout'])){
-			unset($login);
-			session_unregister("id_user");
-			session_unregister("org_id");
-			session_unregister("set");
-			$page = "home";
-			if (isset($_REQUEST['timeout']) && $_REQUEST['timeout']==1) $msg= "Inactivity logout - 600 mins";
-		}
-		if (isset($_REQUEST['login'])){
-			$page = "home";
-		}
-		if (!isset($styleNo)) $styleNo = NULL;	
-*/
+		$adminUrl="http://podcast-admin-dev.open.ac.uk/admin.php";
+		$adminAPI="http://podcast-admin-dev.open.ac.uk/";
+//		$adminUrl="http://localhost/admin.php";
+		$mediaUrl="http://podcast-admin-dev.open.ac.uk/";
+//		$mediaUrl="http://localhost/";
+
 ?>

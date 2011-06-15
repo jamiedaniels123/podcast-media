@@ -26,7 +26,7 @@ if ($dataMess[1]!='') {
 
 	$dataObj = new Default_Model_Action_Class($mysqli);	
 
-	$sqlQuery = "SELECT * FROM command_routes AS cr where cr.cr_action = '".$data['command']."'";
+	$sqlQuery = "SELECT * FROM command_routes AS cr, api_destinations as ad where cr.cr_destination=ad.ad_name AND cr.cr_action = '".$data['command']."'";
 
 // echo 	$sqlQuery;
 	$result = $mysqli->query($sqlQuery);
@@ -34,21 +34,23 @@ if ($dataMess[1]!='') {
 	
 	if ($result->num_rows) {
 
-		$m_data0 = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
+		$m_data[] = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 
 // echo $data['command'].", ".$mediaUrl.", ".$data['data'].", ".$data['number'];
-		$m_data1=$outObj->message_send($data['command'], $mediaUrl, $data['data'], $data['number']);
+		$m_data[]=$outObj->message_send($data['command'], $row->ad_url, $data['data'], $data['number']);
+//		$m_data[] = array('status'=>'ACK', 'data'=>'Command sent to ! '.$row->ad_url, 'timestamp'=>time());
 
 	}else{
-		$m_data = array('status'=>'NACK', 'data'=>'Command not known!', 'timestamp'=>time());
+		$m_data[] = array('status'=>'NACK', 'data'=>'Command not known!', 'timestamp'=>time());
 
 	}
 
 }else{
-	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
+	$m_data[] = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 
 }
-
+// echo "mediaUrl-".$row->ad_url;
+// print_r ($m_data);
 $jsonData = json_encode($m_data);
 echo $jsonData;
 

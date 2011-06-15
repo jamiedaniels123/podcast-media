@@ -11,14 +11,10 @@
 
 //___DB CONNECTION_________________________________________________________________________________//
 
-$dbLogin = array ('dbhost' => "localhost", 'dbname' => "encoder-api", 'dbusername' => "in625", 'dbuserpass' => "ge5HUQes");
+$dbLogin = array ('dbhost' => "localhost", 'dbname' => "media-api", 'dbusername' => "in625", 'dbuserpass' => "ge5HUQes");
 
-//_________________________________________________________________________________________________//
+//___TIME ZONE_________________________________________________________________________________//
 
-		$adminUrl="http://podcast-admin-dev.open.ac.uk/admin.php";
-		$adminAPI="http://podcast-admin-dev.open.ac.uk/";
-//		$adminUrl="http://localhost/admin.php";
-		$mediaUrl="http://podcast-admin-dev.open.ac.uk/";
-//		$mediaUrl="http://localhost/";
+date_default_timezone_set("Europe/London");
 
 ?>

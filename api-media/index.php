@@ -7,8 +7,8 @@
 \*=========================================================================================*/
 
 require_once("./lib/config.php");
-require_once("./lib/classes/action-encoder.class.php");
-require_once("./lib/classes/output.class.php");
+require_once("./lib/classes/action-media.class.php");
+//require_once("./lib/classes/output.class.php");
 
 $dataStream = file_get_contents("php://input");
 
@@ -22,9 +22,9 @@ if ($dataMess[1]!='') {
 
 	$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
 
-	$outObj = new Default_Model_Output_Class();
+//	$outObj = new Default_Model_Output_Class();
 
-	$dataObj = new Default_Model_Action_Class($mysqli,$outObj);	
+	$dataObj = new Default_Model_Action_Class($mysqli);	
 
 	$sqlQuery = "SELECT * FROM command_routes AS cr where cr.cr_action = '".$data['command']."'";
 
@@ -36,9 +36,11 @@ if ($dataMess[1]!='') {
 
 		if ($row->cr_route_type=='queue'){
 			$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
+//			$m_data = array('status'=>'ACK', 'data'=>'Queue action requested', 'timestamp'=>time());
 		
 		}else if ($row->cr_route_type=='direct'){
-			$m_data = $dataObj->directAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
+			$m_data = $dataObj->directAction($data['data'],$data['number'],$data['command'],$row->cr_function,$data['timestamp']);
+//			$m_data = array('status'=>'ACK', 'data'=>'Direct action requested', 'timestamp'=>time());
 		
 		}
 

@@ -6,80 +6,58 @@
 	#	controller to process actions queued in the media_actions table and report status to the admin server
 \*=========================================================================================*/
 
-require_once("../lib/config.php");
-require_once("../lib/classes/action.class.php");
-require_once("../lib/classes/output.class.php");
+require_once("./lib/config.php");
+require_once("./lib/classes/action-encoder.class.php");
+require_once("./lib/classes/output.class.php");
 
 // Initialise objects
 
-	$dataObj = new Default_Model_Action_Class();
+	$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
+	$dataObj = new Default_Model_Action_Class($mysqli);	
 	$outObj = new Default_Model_Output_Class();
 
 // Get the actions from the queue table
 
-	$sqlQuery = "SELECT * FROM command_queue AS cq where cq.cq_status = 'N' ORDER BY cq.cq_command";
+	$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr where cq.cq_command=cr.cr_action AND cq.cq_status = 'N' ORDER BY cq.cq_command";
 //	echo $sqlQuery;
-	$res = mysql_query($sqlQuery);
+	$result = $mysqli->query($sqlQuery);
+	if ($result->num_rows) {
 	
 // Process the outstanding actions 
-
-	while($actObj=mysql_fetch_object($res)) { 
-	
-		if ($actObj->cq_command=='processfile'){
-			$pfi_data[]= unserialize($actObj->cq_data);
-			$pfi_data['row']= $actObj->cq_index;
-				
-		}else if ($actObj->cq_command=='checkfile'){
-			$cfi_data[]= unserialize($actObj->cq_data);
-			$pfi_data['row']= $actObj->cq_index;
-
-		}else if ($actObj->cq_command=='metadata'){
-			$mfi_data[]= unserialize($actObj->cq_data);
-			$pfi_data['row']= $actObj->cq_index;
-
-		}else if ($actObj->cq_command=='deletefile'){
-			$pfi_data[]= unserialize($actObj->cq_data);
-			$pfi_data['row']= $actObj->cq_index;
-			
-		}else if ($actObj->cq_command=='deletefolder'){
-			$pfo_data[]= unserialize($actObj->cq_data);
-			$pfi_data['row']= $actObj->cq_index;
-
+		while(	$row = $result->fetch_object()) { 
+			$function=$row->cr_function;
+			$m_data[] = $dataObj->execAction( unserialize($row->cq_data), $row->cq_index, $function, time());					
 		}
 	}
 
-		if (isset($pfi_data)){
-				
-			$m_data = $dataObj->doProcessFile($pfi_data, count($pfi_data));
-			$result=$outObj->message_send('processfile', $adminUrl, $m_data['data'], $m_data['number']);
-				
-		}if (isset($cfi_data)){
-			$m_data = $dataObj->doCheckFile($cfi_data, count($cfi_data));
-			$result=$outObj->message_send('checkfile', $adminUrl, $m_data['data'], $m_data['number']);
-			
-		}if (isset($mfi_data)){
-			$m_data = $dataObj->doMetaData($mfi_data, count($mfi_data));
-			$result=$outObj->message_send('metadata', $adminUrl, $m_data['data'], $m_data['number']);
-		
-		}if (isset($dfi_data)){
-			$m_data = $dataObj->doDeleteFile($dfi_data, count($dfi_data));
-			$result=$outObj->message_send('deletefile', $adminUrl, $m_data['data'], $m_data['number']);
-			
-		}if (isset($dfo_data)){
-			$m_data = $dataObj->doDeleteFolder($dfo_data, count($dfo_data));
-			$result=$outObj->message_send('deletefolder', $adminUrl, $m_data['data'], $m_data['number']);
-		}
-
-
-// Report the ststus of completed tasks
-
-if (!isset($m_data)) {
-	
-	$m_data=array('data'=>'Nothing to do!');
-	$action='status';
-	$number=1;
-	$result=$outObj->message_send($action, $adminUrl, $m_data, $number);
-
-}
-
+// Report the status of completed tasks
 ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Admin post command</title>
+<script type="application/x-javascript">
+<!--
+function submitform()
+{
+	document.getElementById('action').submit();
+}
+-->
+</script>
+</head>
+
+<body>
+
+<br /><?PHP if (isset($m_data)) print_r($m_data);?><br /><br /> 
+ <form action="" method="post" enctype="application/x-www-form-urlencoded" name="action" id="action">
+ 
+ <select name="action_select" onchange="javascript:submitform();">
+ <option value="">Select action ...</option>
+ <option value="execute">Execute items in queue</option>
+ </select>
+ 
+ </form>
+ <?PHP // phpinfo(); ?>
+</body>
+</html>
