@@ -7,7 +7,7 @@
 
 //___Debug_________________________________________________________________________________________//
 
-//	ini_set(display_errors,On);
+	ini_set(display_errors,On);
 
 //___DB CONNECTION_________________________________________________________________________________//
 
@@ -17,17 +17,21 @@ $dbLogin = array ('dbhost' => "localhost", 'dbname' => "admin-api", 'dbusername'
 
 date_default_timezone_set("Europe/London");
 
+//___API_NAME_________________________________________________________________________________//
+
+$apiName= "admin-api";
+	
 //____SCP SOURCE/DESTINATIONS_________________________________________________________________//
 
-  $source = array(
+$source = array(
   	'admin' => '/data/web/podcast-api-dev.open.ac.uk/file-transfer/source/'
   );
   
-  $destination = array(
+$destination = array(
   	'media' => 'media-transfer-dev@media-podcast-api-dev.open.ac.uk:/data/web/media-podcast-api-dev.open.ac.uk/file-transfer/destination/',
   );
 
-  $source1 = array( 
+$source1 = array( 
   	'admin' => array (
   		'user'=> 'admin-transfer-dev', 
 		'server'=> 'podcast-api-dev.open.ac.uk', 
@@ -47,7 +51,7 @@ date_default_timezone_set("Europe/London");
 		'publickey'=>'')
   );
   
-  $destination1 = array(
+$destination1 = array(
   	'admin' => array (
 		'user'=> 'admin-transfer-dev', 
 		'server'=> 'podcast-api-dev.open.ac.uk', 

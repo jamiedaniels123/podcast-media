@@ -6,11 +6,12 @@
 	#  Class File to handle file service actions and provide responses.
 \*=========================================================================================*/
 
-class Default_Model_Action_Class
- {
+class Default_Model_Action_Class 
+// extends Default_Model_DB_Class
+  {
 	
 	/**  * Constructor  */
-    function Default_Model_Action_Class($mysqli,$outObj){}  
+    function Default_Model_Action_Class($mysqli,$outObj,$apiName){}  
 
 // ------ User stuff
 
@@ -27,31 +28,6 @@ class Default_Model_Action_Class
 		}
 	}
 	
-	function dir_tree($dir) {
-		$path = '';
-		$stack[] = $dir;
-		while ($stack) {
-		   $thisdir = array_pop($stack);
-		   $reldir = substr($thisdir,strlen($dir));
-		   if ($dircont = scandir($thisdir)) {
-			   $i=0;
-			   while (isset($dircont[$i])) {
-				   if ($dircont[$i] !== '.' && $dircont[$i] !== '..') {
-					   $current_file = "{$thisdir}/{$dircont[$i]}";
-					   if (is_file($current_file)) {
-						   $path[] = "{$reldir}/{$dircont[$i]}";
-					   } elseif (is_dir($current_file)) {
-							$path[] = "{$reldir}/{$dircont[$i]}";
-						   $stack[] = $current_file;
-					   }
-				   }
-				   $i++;
-			   }
-		   }
-		}
-		return $path;
-	}
-
 	public function transfer($src, $dest) {
 			
 		$cmdline = "/usr/bin/scp -pv ".escapeshellcmd($src)." ".escapeshellcmd($dest)." 2>&1";
@@ -98,7 +74,7 @@ class Default_Model_Action_Class
 	{
 		global $mysqli;
 
-		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued admin-api!', 'status'=>'') ;
+		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued admin-api!', 'status'=>'', 'timestamp'=>time()) ;
 		$dataArr='';	
 		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_time_start`) VALUES ( '".$action."', '".date("Y-m-d H:i:s", $timestamp)."' )";
 //	echo $sqlMessages;
@@ -114,39 +90,35 @@ class Default_Model_Action_Class
 //	echo $sqlCommands;
 		$result = $mysqli->query($sqlCommands);
 		$error = $mysqli->info;
-		if ($retData!='') {$retData['number']=$i;$retData['status']='ACK';} else {$retData['number']=0;$retData['status']='NACK';}
-		return $retData;
-	}
-
-	public function execAction($mArr,$cqIndex,$function,$timestamp)
-	{
-		global $mysqli,$outObj,$mediaUrl;
 		
-		$retData = $this->$function($mArr,1,$cqIndex);
-		$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$retData['result']."', `cq_update`='".date("Y-m-d H:i:s", $timestamp)."' WHERE `cq_index`=  '".$cqIndex."' ";
-		$result = $mysqli->query($sqlQuery);
-		$error = $mysqli->info;
-//		echo $sqlQuery."-".$error;
-
+		if ($retData!='') {$retData['number']=$i;$retData['status']='ACK'; $retData['mqIndex']=$mess_id;} else {$retData['number']=0;$retData['status']='NACK';}
 		return $retData;
 	}
 
-	public function returnAction($mArr,$mNum,$action,$function,$timestamp)
+	public function directAction($action,$mqIndex)
 	{
-		global $mysqli,$outObj,$mediaUrl;
-		$i=0;
-		while (isset($mArr[$i])){
-			$retData[] = $this->$function($mArr[$i],$i);
-			$sqlQuery = "UPDATE `queue_commands` SET `cq_update` = '".date("Y-m-d H:i:s", $timestamp)."' ,`cq_status`= 'Y', cq_result='".$mArr[$i]['data']."' where cq_index='".$mArr[$i]['command_id']."' ";
-			$result = $mysqli->query($sqlQuery);
-//			$error = $mysqli->info;
-			$messages[]['message_id'] = $mArr[$i]['message_id'];
-			$i++;
+		global $mysqli, $apiName;
+
+		$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cr.cr_action='".$action."' AND cq.cq_mq_index='".$mqIndex."' AND cr.cr_route_type='direct' ";
+		$result = $mysqli->query($sqlQuery);
+		if (isset($result->num_rows)) {
+		
+			// Process the outstanding actions 
+			while(	$row = $result->fetch_object()) { 
+				$function=$row->cr_function;
+				if ($row->cq_result!='') $retData = unserialize($row->cq_result);
+				// Call the action with the data
+ 				$retData = $this->$function(unserialize($row->cq_data),1,$row->cq_index);
+				if ($row->wf_steps < $row->wf_step) $step=$row->wf_step +1; else $step=$row->wf_step;
+				if ($row->wf_steps == $row->wf_step) $status=$retData['result'];
+				$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$status."', `cq_wf_step`='".$step."', `cq_update`='".date("Y-m-d H:i:s", $timestamp)."' WHERE `cq_index`=  '".$cqIndex."' ";
+				$result = $mysqli->query($sqlQuery);
+				$error = $mysqli->info;
+			}
 		}
-//	echo $sqlQuery;
-		return $messages;
+		 return array('mqIndex'=>$mqIndex);
 	}
-	
+
 	public function doTransferFileToMediaServer($mArr,$mNum,$cqIndex)
 	{
 		global $source, $destination; 
@@ -163,6 +135,19 @@ class Default_Model_Action_Class
 	public function doTransferFolderToMediaServer($mArr,$mNum,$cqIndex)
 	{
 		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'success/fail') ;
+
+		return $retData;
+	}
+
+	public function doMediaPushFile($mArr,$mNum,$cqIndex)
+	{
+		global $source, $destination; 
+
+		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '', 'scp'=>'', 'number'=> $mNum, 'result'=> 'N') ;
+
+// echo $source['admin'].$mArr['infile'].", ".$destination['media'].$mArr['outfile']."<br />";
+ 		$retData['scp'] = $this->transfer($source['admin'].$mArr['infile'] , $destination['media'].$mArr['outfile']);
+// 		$retData['scp'] = $this->transfer1($source1['admin'], $destination1['media'], $mArr['infile'], $mArr['outfile']);
 
 		return $retData;
 	}

@@ -141,17 +141,17 @@ if (isset($_REQUEST['action_select'])) {
 
 	}else{
 		$fdata[]=array('data'=>'some data here!');
-		$action='status';
+		$action='status-media';
 		$number=1;
 	}
 	
 }else{
 	$fdata=array('data'=>'some data here!');
-	$action='status';
+	$action='status-media';
 	$number=1;
 }
 
-// echo $mediaUrl;
+// echo $action.", ".$mediaUrl.", ".$fdata.", ".$number;
 	$result=$outObj->message_send($action, $mediaUrl, $fdata, $number);
 
 ?>

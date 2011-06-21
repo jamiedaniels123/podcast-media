@@ -3,7 +3,7 @@
 # Server version:               5.5.8
 # Server OS:                    Win32
 # HeidiSQL version:             6.0.0.3603
-# Date/time:                    2011-06-17 13:50:00
+# Date/time:                    2011-06-21 16:04:34
 # --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -37,12 +37,31 @@ INSERT INTO `api_destinations` (`ad_index`, `ad_name`, `ad_url`, `ad_ip`, `ad_up
 /*!40000 ALTER TABLE `api_destinations` ENABLE KEYS */;
 
 
+# Dumping structure for table admin-api.api_end_points
+DROP TABLE IF EXISTS `api_end_points`;
+CREATE TABLE IF NOT EXISTS `api_end_points` (
+  `ep_index` int(10) NOT NULL DEFAULT '0',
+  `ep_filetype` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ep_path` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `ep_update` datetime DEFAULT NULL,
+  PRIMARY KEY (`ep_index`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+# Dumping data for table admin-api.api_end_points: ~2 rows (approximately)
+/*!40000 ALTER TABLE `api_end_points` DISABLE KEYS */;
+INSERT INTO `api_end_points` (`ep_index`, `ep_filetype`, `ep_path`, `ep_update`) VALUES
+	(1, 'video-wide', '/video-wide', '2011-06-10 10:02:09'),
+	(2, 'audio', '/audio', '2011-06-10 10:01:59');
+/*!40000 ALTER TABLE `api_end_points` ENABLE KEYS */;
+
+
 # Dumping structure for table admin-api.api_log
 DROP TABLE IF EXISTS `api_log`;
 CREATE TABLE IF NOT EXISTS `api_log` (
   `al_index` int(10) NOT NULL AUTO_INCREMENT,
-  `al_datastream` text COLLATE utf8_unicode_ci,
   `al_message` text COLLATE utf8_unicode_ci,
+  `al_reply` text COLLATE utf8_unicode_ci,
+  `al_result_data` text COLLATE utf8_unicode_ci,
   `al_timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`al_index`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
@@ -55,16 +74,37 @@ CREATE TABLE IF NOT EXISTS `api_log` (
 # Dumping structure for table admin-api.api_workflows
 DROP TABLE IF EXISTS `api_workflows`;
 CREATE TABLE IF NOT EXISTS `api_workflows` (
-  `wf_index` int(10) NOT NULL DEFAULT '0',
+  `wf_index` int(10) NOT NULL AUTO_INCREMENT,
   `wf_cr_index` int(10) DEFAULT NULL,
+  `wf_ad_index` int(10) DEFAULT NULL,
   `wf_step` int(10) DEFAULT NULL,
+  `wf_steps` int(10) DEFAULT NULL,
   `wf_command` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
+  `wf_function` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`wf_index`),
-  KEY `wf_command_id` (`wf_cr_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+  KEY `wf_command_id` (`wf_cr_index`),
+  KEY `wf_ad_index` (`wf_ad_index`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-# Dumping data for table admin-api.api_workflows: ~0 rows (approximately)
+# Dumping data for table admin-api.api_workflows: ~16 rows (approximately)
 /*!40000 ALTER TABLE `api_workflows` DISABLE KEYS */;
+INSERT INTO `api_workflows` (`wf_index`, `wf_cr_index`, `wf_ad_index`, `wf_step`, `wf_steps`, `wf_command`, `wf_function`) VALUES
+	(1, 1, 4, 1, 4, 'encoder-pull-file', 'doEncoderPullFile'),
+	(2, 1, 4, 2, 4, 'encoder-check-output', 'doEncoderCheckOutput'),
+	(3, 1, 4, 3, 4, 'encoder-push-to-media', 'doEncoderPushToMedia'),
+	(4, 1, 3, 4, 4, 'media-move-file', 'doMediaMoveFile'),
+	(5, 3, 2, 1, 3, 'media-push-file', 'doMediaPushFile'),
+	(6, 3, 3, 2, 3, 'push-command', 'doPushCommand'),
+	(7, 3, 3, 3, 3, 'media-move-file', 'doMediaMoveFile'),
+	(8, 7, 3, 1, 2, 'push-command', 'doPushCommand'),
+	(9, 7, 3, 2, 2, 'update-metadata', 'doUpdateMetadata'),
+	(10, 10, 3, 1, 2, 'push-command', 'doPushCommand'),
+	(11, 10, 3, 2, 2, 'update-permisssions', 'doUpdatePermissions'),
+	(12, 5, 3, 1, 2, 'push-command', 'doPushCommand'),
+	(13, 5, 3, 2, 2, 'delete-file', 'doDeleteFile'),
+	(14, NULL, NULL, NULL, NULL, NULL, NULL),
+	(15, NULL, NULL, NULL, NULL, NULL, NULL),
+	(16, NULL, NULL, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `api_workflows` ENABLE KEYS */;
 
 
@@ -86,7 +126,7 @@ CREATE TABLE IF NOT EXISTS `command_routes` (
 /*!40000 ALTER TABLE `command_routes` DISABLE KEYS */;
 INSERT INTO `command_routes` (`cr_index`, `cr_source`, `cr_destination`, `cr_execute`, `cr_action`, `cr_function`, `cr_callback`, `cr_route_type`) VALUES
 	(1, 'admin-api', 'encoder-api', 'encoder-api', 'transcode-media', 'doTranscodeMedia', 'transcode-media', 'queue'),
-	(2, 'admin-api', 'encoder-api', 'encoder-api', 'transcode-media-and-deliver', 'doTranscodeMediaAndDeliver', 'transcode-media-and-deliver', 'queue'),
+	(2, 'admin-api', 'encoder-api', 'encoder-api', 'transcode-media-deliver', 'doTranscodeMediaAndDeliver', 'transcode-media-and-deliver', 'queue'),
 	(3, 'admin-api', 'media-api', 'admin-api', 'transfer-file-to-media-server', 'doTransferFileToMediaServer', 'transfer-file-to-media-server', 'queue'),
 	(4, 'admin-api', 'media-api', 'admin-api', 'transfer-folder-to-media-server', 'doTransferFolderToMediaServer', 'transfer-folder-to-media-server', 'queue'),
 	(5, 'admin-api', 'media-api', 'media-api', 'delete-file-on-media-server', 'doDeleteFileOnMediaServer', 'delete-file-on-media-server', 'direct'),
@@ -107,35 +147,40 @@ INSERT INTO `command_routes` (`cr_index`, `cr_source`, `cr_destination`, `cr_exe
 DROP TABLE IF EXISTS `queue_commands`;
 CREATE TABLE IF NOT EXISTS `queue_commands` (
   `cq_index` int(10) NOT NULL AUTO_INCREMENT,
-  `cq_message_id` int(10) DEFAULT '0',
+  `cq_mq_index` int(10) DEFAULT '0',
   `cq_command` varchar(255) COLLATE utf8_unicode_ci DEFAULT '0',
   `cq_data` text COLLATE utf8_unicode_ci,
   `cq_result` text COLLATE utf8_unicode_ci,
   `cq_time` datetime DEFAULT NULL,
   `cq_update` datetime DEFAULT NULL,
+  `cq_wf_step` int(11) NOT NULL DEFAULT '1',
   `cq_status` enum('Y','N','F','R') COLLATE utf8_unicode_ci DEFAULT 'N',
   PRIMARY KEY (`cq_index`),
-  KEY `ma_command` (`cq_message_id`,`cq_command`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+  KEY `ma_command` (`cq_mq_index`,`cq_command`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
 
-# Dumping data for table admin-api.queue_commands: ~0 rows (approximately)
+# Dumping data for table admin-api.queue_commands: ~1 rows (approximately)
 /*!40000 ALTER TABLE `queue_commands` DISABLE KEYS */;
+INSERT INTO `queue_commands` (`cq_index`, `cq_mq_index`, `cq_command`, `cq_data`, `cq_result`, `cq_time`, `cq_update`, `cq_wf_step`, `cq_status`) VALUES
+	(1, 1, 'transfer-file-to-media-server', 'a:6:{s:13:"collection_id";s:0:"";s:6:"infile";s:31:"dd205-globalised-world-rss2.xml";s:7:"outfile";s:31:"dd205-globalised-world-rss2.xml";s:4:"type";s:5:"utube";s:6:"encode";s:6:"500kbs";s:5:"count";s:1:"1";}', NULL, '2011-06-21 12:21:30', '0000-00-00 00:00:00', 1, 'N');
 /*!40000 ALTER TABLE `queue_commands` ENABLE KEYS */;
 
 
 # Dumping structure for table admin-api.queue_messages
 DROP TABLE IF EXISTS `queue_messages`;
 CREATE TABLE IF NOT EXISTS `queue_messages` (
-  `mq_index` int(10) NOT NULL DEFAULT '0',
+  `mq_index` int(10) NOT NULL AUTO_INCREMENT,
   `mq_command` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `mq_time_start` datetime DEFAULT NULL,
   `mq_time_complete` datetime DEFAULT NULL,
   `mq_status` enum('Y','N') COLLATE utf8_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`mq_index`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
 
-# Dumping data for table admin-api.queue_messages: ~0 rows (approximately)
+# Dumping data for table admin-api.queue_messages: ~1 rows (approximately)
 /*!40000 ALTER TABLE `queue_messages` DISABLE KEYS */;
+INSERT INTO `queue_messages` (`mq_index`, `mq_command`, `mq_time_start`, `mq_time_complete`, `mq_status`) VALUES
+	(1, 'transfer-file-to-media-server', '2011-06-21 12:21:30', NULL, NULL);
 /*!40000 ALTER TABLE `queue_messages` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

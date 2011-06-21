@@ -21,6 +21,7 @@ date_default_timezone_set("Europe/London");
 //		$adminUrl="http://localhost/api-admin/admin.php";
 		$adminUrl="http://podcast-api-dev.open.ac.uk/admin.php";
 //		$mediaUrl="http://localhost/api-admin/";
-		$mediaUrl="http://podcast-api-dev.open.ac.uk/";
+//		$mediaUrl="http://podcast-api-dev.open.ac.uk/";
+		$mediaUrl="http://podcast-api-dev.open.ac.uk/index1.php";
 
 ?>

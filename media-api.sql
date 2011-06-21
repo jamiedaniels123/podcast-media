@@ -3,7 +3,7 @@
 # Server version:               5.5.8
 # Server OS:                    Win32
 # HeidiSQL version:             6.0.0.3603
-# Date/time:                    2011-06-15 10:33:36
+# Date/time:                    2011-06-21 10:27:07
 # --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -14,6 +14,21 @@
 # Dumping database structure for media-api
 CREATE DATABASE IF NOT EXISTS `media-api` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */;
 USE `media-api`;
+
+
+# Dumping structure for table media-api.api_log
+DROP TABLE IF EXISTS `api_log`;
+CREATE TABLE IF NOT EXISTS `api_log` (
+  `al_index` int(10) NOT NULL AUTO_INCREMENT,
+  `al_datastream` text COLLATE utf8_unicode_ci,
+  `al_message` text COLLATE utf8_unicode_ci,
+  `al_timestamp` datetime DEFAULT NULL,
+  PRIMARY KEY (`al_index`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci ROW_FORMAT=COMPACT;
+
+# Dumping data for table media-api.api_log: ~0 rows (approximately)
+/*!40000 ALTER TABLE `api_log` DISABLE KEYS */;
+/*!40000 ALTER TABLE `api_log` ENABLE KEYS */;
 
 
 # Dumping structure for table media-api.command_queue

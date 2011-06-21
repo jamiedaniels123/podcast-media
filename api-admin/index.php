@@ -7,6 +7,7 @@
 \*=========================================================================================*/
 
 require_once("./lib/config.php");
+// require_once("./lib/classes/db.class.php");
 require_once("./lib/classes/action-admin.class.php");
 require_once("./lib/classes/output.class.php");
 
@@ -23,8 +24,7 @@ if ($dataMess[1]!='') {
 
 	$outObj = new Default_Model_Output_Class();
 	
-	$dataObj = new Default_Model_Action_Class($mysqli);	
-
+	$dataObj = new Default_Model_Action_Class($mysqli,$outObj,$apiName);	
 
 	$sqlQuery = "SELECT * FROM command_routes AS cr, api_destinations as ad where cr.cr_destination=ad.ad_name AND cr.cr_action = '".$data['command']."'";
 
@@ -34,10 +34,14 @@ if ($dataMess[1]!='') {
 	
 	if ($result->num_rows) {
 
+// Put command message on message queue and data for each request on the command queue
+
 		$m_data[] = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 
-// echo $data['command'].", ".$mediaUrl.", ".$data['data'].", ".$data['number'];
-		$m_data[]=$outObj->message_send($data['command'], $row->ad_url, $data['data'], $data['number']);
+// Do anything now which needs to be done directly	
+
+//		$m_data[] = $dataObj->directAction($data['command']);
+
 //		$m_data[] = array('status'=>'ACK', 'data'=>'Command sent to ! '.$row->ad_url, 'timestamp'=>time());
 
 	}else{
@@ -49,7 +53,7 @@ if ($dataMess[1]!='') {
 	$m_data[] = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 
 }
-	$sqlLogging = "INSERT INTO `api_log` (`al_datastream`, `al_message`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".date("Y-m-d H:i:s", time())."' )";
+	$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".date("Y-m-d H:i:s", time())."' )";
 	$result = $mysqli->query($sqlLogging);
 // echo "mediaUrl-".$row->ad_url;
 // print_r ($m_data);
