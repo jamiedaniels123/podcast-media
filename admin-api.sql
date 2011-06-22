@@ -3,7 +3,7 @@
 # Server version:               5.5.8
 # Server OS:                    Win32
 # HeidiSQL version:             6.0.0.3603
-# Date/time:                    2011-06-21 16:04:34
+# Date/time:                    2011-06-22 16:43:09
 # --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -84,27 +84,29 @@ CREATE TABLE IF NOT EXISTS `api_workflows` (
   PRIMARY KEY (`wf_index`),
   KEY `wf_command_id` (`wf_cr_index`),
   KEY `wf_ad_index` (`wf_ad_index`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=112 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-# Dumping data for table admin-api.api_workflows: ~16 rows (approximately)
+# Dumping data for table admin-api.api_workflows: ~18 rows (approximately)
 /*!40000 ALTER TABLE `api_workflows` DISABLE KEYS */;
 INSERT INTO `api_workflows` (`wf_index`, `wf_cr_index`, `wf_ad_index`, `wf_step`, `wf_steps`, `wf_command`, `wf_function`) VALUES
-	(1, 1, 4, 1, 4, 'encoder-pull-file', 'doEncoderPullFile'),
-	(2, 1, 4, 2, 4, 'encoder-check-output', 'doEncoderCheckOutput'),
-	(3, 1, 4, 3, 4, 'encoder-push-to-media', 'doEncoderPushToMedia'),
-	(4, 1, 3, 4, 4, 'media-move-file', 'doMediaMoveFile'),
-	(5, 3, 2, 1, 3, 'media-push-file', 'doMediaPushFile'),
-	(6, 3, 3, 2, 3, 'push-command', 'doPushCommand'),
-	(7, 3, 3, 3, 3, 'media-move-file', 'doMediaMoveFile'),
-	(8, 7, 3, 1, 2, 'push-command', 'doPushCommand'),
-	(9, 7, 3, 2, 2, 'update-metadata', 'doUpdateMetadata'),
-	(10, 10, 3, 1, 2, 'push-command', 'doPushCommand'),
-	(11, 10, 3, 2, 2, 'update-permisssions', 'doUpdatePermissions'),
-	(12, 5, 3, 1, 2, 'push-command', 'doPushCommand'),
-	(13, 5, 3, 2, 2, 'delete-file', 'doDeleteFile'),
-	(14, NULL, NULL, NULL, NULL, NULL, NULL),
-	(15, NULL, NULL, NULL, NULL, NULL, NULL),
-	(16, NULL, NULL, NULL, NULL, NULL, NULL);
+	(1, 1, 2, 1, 6, 'push-next-command', 'doPushNextCommand'),
+	(2, 1, 4, 2, 6, 'encoder-pull-file', 'doEncoderPullFile'),
+	(3, 1, 2, 3, 6, 'push-next-command', 'doPushNextCommand'),
+	(4, 1, 4, 4, 6, 'encoder-check-output', 'doEncoderCheckOutput'),
+	(5, 1, 4, 5, 6, 'encoder-push-to-media', 'doEncoderPushToMedia'),
+	(6, 1, 3, 6, 6, 'media-move-file', 'doMediaMoveFile'),
+	(7, 3, 2, 1, 3, 'media-push-file', 'doMediaPushFile'),
+	(8, 3, 2, 2, 3, 'push-next-command', 'doPushNextCommand'),
+	(9, 3, 3, 3, 3, 'media-move-file', 'doMediaMoveFile'),
+	(10, 7, 2, 1, 2, 'push-next-command', 'doPushCommand'),
+	(11, 7, 3, 2, 2, 'update-metadata', 'doUpdateMetadata'),
+	(12, 10, 2, 1, 2, 'push-next-command', 'doPushNextCommand'),
+	(13, 10, 3, 2, 2, 'update-permisssions', 'doUpdatePermissions'),
+	(14, 5, 2, 1, 2, 'push-next-command', 'doPushNextCommand'),
+	(15, 5, 3, 2, 2, 'delete-file', 'doDeleteFile'),
+	(16, NULL, NULL, NULL, NULL, NULL, NULL),
+	(17, NULL, NULL, NULL, NULL, NULL, NULL),
+	(18, NULL, NULL, NULL, NULL, NULL, NULL);
 /*!40000 ALTER TABLE `api_workflows` ENABLE KEYS */;
 
 
@@ -162,7 +164,7 @@ CREATE TABLE IF NOT EXISTS `queue_commands` (
 # Dumping data for table admin-api.queue_commands: ~1 rows (approximately)
 /*!40000 ALTER TABLE `queue_commands` DISABLE KEYS */;
 INSERT INTO `queue_commands` (`cq_index`, `cq_mq_index`, `cq_command`, `cq_data`, `cq_result`, `cq_time`, `cq_update`, `cq_wf_step`, `cq_status`) VALUES
-	(1, 1, 'transfer-file-to-media-server', 'a:6:{s:13:"collection_id";s:0:"";s:6:"infile";s:31:"dd205-globalised-world-rss2.xml";s:7:"outfile";s:31:"dd205-globalised-world-rss2.xml";s:4:"type";s:5:"utube";s:6:"encode";s:6:"500kbs";s:5:"count";s:1:"1";}', NULL, '2011-06-21 12:21:30', '0000-00-00 00:00:00', 1, 'N');
+	(1, 1, 'transfer-file-to-media-server', 'a:6:{s:13:"collection_id";s:0:"";s:6:"infile";s:31:"dd205-globalised-world-rss2.xml";s:7:"outfile";s:31:"dd205-globalised-world-rss2.xml";s:4:"type";s:5:"utube";s:6:"encode";s:6:"500kbs";s:5:"count";s:1:"1";}', NULL, '2011-06-21 12:21:30', '0000-00-00 00:00:00', 2, 'N');
 /*!40000 ALTER TABLE `queue_commands` ENABLE KEYS */;
 
 

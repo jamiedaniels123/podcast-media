@@ -30,8 +30,8 @@ class Default_Model_Action_Class
 	
 	public function transfer($src, $dest) {
 			
-		$cmdline = "/usr/bin/scp -pv ".escapeshellcmd($src)." ".escapeshellcmd($dest)." 2>&1";
-		echo "<p>Transfer cmd line =".$cmdline."</p>\n";  // debug
+		$cmdline = "/usr/bin/scp -p ".escapeshellcmd($src)." ".escapeshellcmd($dest)." 2>&1";
+//		echo "<p>Transfer cmd line =".$cmdline."</p>\n";  // debug
 		
 		//error_log("Transfer cmd line =".$cmdline);  // debug
 	  
@@ -76,7 +76,7 @@ class Default_Model_Action_Class
 
 		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued admin-api!', 'status'=>'', 'timestamp'=>time()) ;
 		$dataArr='';	
-		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_time_start`) VALUES ( '".$action."', '".date("Y-m-d H:i:s", $timestamp)."' )";
+		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_time_start`, `mq_status`) VALUES ( '".$action."', '".date("Y-m-d H:i:s", $timestamp)."', 'N' )";
 //	echo $sqlMessages;
 		$result = $mysqli->query($sqlMessages);
 		$mess_id = $mysqli->insert_id;
@@ -95,48 +95,34 @@ class Default_Model_Action_Class
 		return $retData;
 	}
 
-	public function directAction($action,$mqIndex)
+	public function directAction($action,$mqIndex,$cqCommand)
 	{
 		global $mysqli, $apiName;
 
-		$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cr.cr_action='".$action."' AND cq.cq_mq_index='".$mqIndex."' AND cr.cr_route_type='direct' ";
-		$result = $mysqli->query($sqlQuery);
-		if (isset($result->num_rows)) {
+		$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cq.cq_command='".$action."' AND cq.cq_mq_index='".$mqIndex."' AND cr.cr_route_type='".$cqCommand."' ";
+// echo $sqlQuery;
+		$result4 = $mysqli->query($sqlQuery);
+		if (isset($result4->num_rows)) {
 		
 			// Process the outstanding actions 
-			while(	$row = $result->fetch_object()) { 
-				$function=$row->cr_function;
-				if ($row->cq_result!='') $retData = unserialize($row->cq_result);
+			while(	$row = $result4->fetch_object()) { 
+				$function=$row->wf_function;
+//				if ($row->cq_result!='') $retData = unserialize($row->cq_result);
 				// Call the action with the data
  				$retData = $this->$function(unserialize($row->cq_data),1,$row->cq_index);
-				if ($row->wf_steps < $row->wf_step) $step=$row->wf_step +1; else $step=$row->wf_step;
-				if ($row->wf_steps == $row->wf_step) $status=$retData['result'];
-				$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$status."', `cq_wf_step`='".$step."', `cq_update`='".date("Y-m-d H:i:s", $timestamp)."' WHERE `cq_index`=  '".$cqIndex."' ";
-				$result = $mysqli->query($sqlQuery);
-				$error = $mysqli->info;
+//				print_r($retData);
+				if ($row->wf_steps > $row->wf_step) $step=$row->wf_step +1; else $step=$row->wf_step;
+				if ($row->wf_steps == $row->wf_step) { 
+					$status=$retData['result'];
+					$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$retData['result']."', `cq_wf_step`='".$step."', `cq_update`='".date("Y-m-d H:i:s", time())."' WHERE `cq_index`=  '".$row->cq_index."' ";
+		echo $sqlQuery;
+					$result = $mysqli->query($sqlQuery);
+					$error = $mysqli->info;
+					echo $error;
+				}
 			}
 		}
 		 return array('mqIndex'=>$mqIndex);
-	}
-
-	public function doTransferFileToMediaServer($mArr,$mNum,$cqIndex)
-	{
-		global $source, $destination; 
-
-		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '', 'scp'=>'', 'number'=> $mNum, 'result'=> 'N') ;
-
-// echo $source['admin'].$mArr['infile'].", ".$destination['media'].$mArr['outfile']."<br />";
- 		$retData['scp'] = $this->transfer($source['admin'].$mArr['infile'] , $destination['media'].$mArr['outfile']);
-// 		$retData['scp'] = $this->transfer1($source1['admin'], $destination1['media'], $mArr['infile'], $mArr['outfile']);
-
-		return $retData;
-	}
-
-	public function doTransferFolderToMediaServer($mArr,$mNum,$cqIndex)
-	{
-		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'success/fail') ;
-
-		return $retData;
 	}
 
 	public function doMediaPushFile($mArr,$mNum,$cqIndex)
@@ -145,13 +131,47 @@ class Default_Model_Action_Class
 
 		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '', 'scp'=>'', 'number'=> $mNum, 'result'=> 'N') ;
 
-// echo $source['admin'].$mArr['infile'].", ".$destination['media'].$mArr['outfile']."<br />";
  		$retData['scp'] = $this->transfer($source['admin'].$mArr['infile'] , $destination['media'].$mArr['outfile']);
 // 		$retData['scp'] = $this->transfer1($source1['admin'], $destination1['media'], $mArr['infile'], $mArr['outfile']);
 
 		return $retData;
 	}
 
+	public function doPushNextCommand($mArr,$mNum,$cqIndex)
+	{
+		global $mysqli, $outObj;
+
+		$retData= array('cqIndex'=>$cqIndex, 'number'=> $mNum, 'result'=> 'N') ;
+		
+		$sqlQuery = "SELECT * FROM queue_commands AS cq, api_workflows AS wf, command_routes AS cr, api_destinations as ad WHERE cq.cq_command=cr.cr_action AND cr.cr_index=wf.wf_cr_index AND wf.wf_ad_index=ad.ad_index AND wf.wf_step= 1 + cq.cq_wf_step AND cq.cq_index='".$cqIndex."'";
+// echo $sqlQuery;
+		$result5 = $mysqli->query($sqlQuery);
+		$row5 = $result5->fetch_object();
+
+// echo $row5->wf_command." , ".$row5->ad_url." , ".$mArr." , ".$mNum;
+		$postRetData=$outObj->message_send($row5->wf_command,$row5->ad_url, unserialize($row5->cq_data), $mNum);
+print_r($postRetData);
+//		if ($postRetData['status']=='ACK') $retData['result']='Y';
+
+		return $retData;
+	}
+
+	public function doTransferFileToMediaServer($mArr,$mNum,$cqIndex)
+	{
+		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '', 'scp'=>'', 'number'=> $mNum, 'result'=> 'N') ;
+
+		echo "doTransferFileToMediaServer";
+
+		return $retData;
+		
+	}
+
+	public function doTransferFolderToMediaServer($mArr,$mNum,$cqIndex)
+	{
+		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'success/fail') ;
+
+		return $retData;
+	}
 
 }
 ?>
