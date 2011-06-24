@@ -8,6 +8,7 @@
 //___Debug_________________________________________________________________________________________//
 
 	ini_set(display_errors,On);
+	$error='';
 
 //___DB CONNECTION_________________________________________________________________________________//
 
@@ -24,12 +25,12 @@ $apiName= "admin-api";
 //____SCP SOURCE/DESTINATIONS_________________________________________________________________//
 
 $source = array(
-  	'admin' => '/data/web/podcast-api-dev.open.ac.uk/file-transfer/source/'
-  );
+  	'admin' => '/data/web/podcast-admin-dev.open.ac.uk/www/app/webroot/upload/files/'
+	);
   
 $destination = array(
-  	'media' => 'media-transfer-dev@media-podcast-api-dev.open.ac.uk:/data/web/media-podcast-api-dev.open.ac.uk/file-transfer/destination/',
-  );
+  	'media' => 'media-transfer-dev@media-podcast-api-dev.open.ac.uk:/data/web/media-podcast-api-dev.open.ac.uk/file-transfer/destination/'
+	);
 
 $source1 = array( 
   	'admin' => array (
