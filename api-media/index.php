@@ -34,7 +34,7 @@ if ($dataMess[1]!='') {
 	if ($result->num_rows) {
 
 		if ($row->cr_route_type=='queue'){
-			$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
+			$m_data = $dataObj->queueAction($data['data'],$data['command'],$data['cqIndex'],$data['mqIndex'],$data['step'],$data['timestamp']);
 //			$m_data = array('status'=>'ACK', 'data'=>$data['data'], 'timestamp'=>time());
 		
 		}else if ($row->cr_route_type=='direct'){

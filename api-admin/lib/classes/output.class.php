@@ -35,6 +35,15 @@ class Default_Model_Output_Class
 		return $response;
 	} 
 
+	function message_send_next_command($command, $mediaUrl, $cqIndex, $mqIndex, $step, $mArr, $mNum){
+		$postData=array(	'command'=>$command, 'number'=>$mNum, 'data'=>$mArr, 'cqIndex'=>$cqIndex,  'mqIndex'=>$mqIndex, 'step'=>$step, 'timestamp'=>time());
+//		print_r($postData);
+		$postData=array('mess'=>json_encode($postData));
+		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
+
+		return $response;
+	} 
+	
 	function rest_helper($url, $params = null, $verb = 'GET', $format = 'json'){
 
 		$cparams = array('http' => array( 'method' => $verb, 'ignore_errors' => true));

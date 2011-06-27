@@ -26,10 +26,20 @@ require_once("./lib/classes/output.class.php");
 	$fdata[]='poll_media';
 
 	$reply=$outObj->message_send('poll', $row->ad_url, $fdata,1);
- 	if ($reply['status']=='Y') {
-		$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($reply['data'])."', `cq_status`='".$reply['status']."', `cq_wf_step`= cq_wf_step + 1, `cq_update`='".date("Y-m-d H:i:s", time())."' WHERE `cq_index`=  '".$reply['cqIndex']."' ";
-		$result = $mysqli->query($sqlQuery);
-		$error = $mysqli->info;
+	print_r($reply);
+ 	if ($reply['status']=='Y') {	
+		foreach($reply['data'] as $k => $v){ 
+			if ($v['status']=='Y') {
+				$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($v)."', `cq_status`='".$v['status']."', `cq_wf_step`= '".$v['step']."', `cq_update`='".date("Y-m-d H:i:s", time())."' WHERE `cq_index`=  '".$v['cqIndex']."' ";
+		 $query[] = $sqlQuery;
+		
+				$result = $mysqli->query($sqlQuery);
+				$error = $mysqli->info;
+
+				$dataObj->doMessageCompletion($v['mqIndex']);
+
+			}
+		}
 	}
 
 
@@ -43,24 +53,8 @@ require_once("./lib/classes/output.class.php");
 // Process the outstanding commands for each message
 		while(	$row0 = $result0->fetch_object()) { 
 			$m_data = $dataObj->directAction($row0->mq_command, $row0->mq_index, 'queue');	
-			$sqlQuery1 = "SELECT * FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$row0->mq_index."' AND cq.cq_status='N' ";
-// $query = $sqlQuery1;
-			$result1 = $mysqli->query($sqlQuery1);
-			if ($result1->num_rows==0) {
-				$sqlQuery2 = "UPDATE `queue_messages` SET `mq_update` = '".date("Y-m-d H:i:s", time())."' ,`mq_status`= 'Y' where mq_index='".$row0->mq_index."' ";
-				$result2 = $mysqli->query($sqlQuery2);
-				$sqlQuery3 = "SELECT * FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$row0->mq_index."'";
-//	echo $sqlQuery3;
-				$result3 = $mysqli->query($sqlQuery3);
-				$i=1;
-				while(	$row3 = $result3->fetch_object()){
-					$r_data[]= unserialize($row3->cq_result); 
-					$i++;
-				}
-				
-//				$result=$outObj->message_send($row0->cr_callback, $row0->ad_url, serialize($r_data), $i);
-				
-			}
+			$dataObj->doMessageCompletion($row0->mq_index);
+
 		}
 	}
 

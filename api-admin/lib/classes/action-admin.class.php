@@ -76,7 +76,7 @@ class Default_Model_Action_Class
 
 		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued admin-api!', 'status'=>'', 'timestamp'=>time()) ;
 		$dataArr='';	
-		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_time_start`, `mq_status`) VALUES ( '".$action."', '".date("Y-m-d H:i:s", $timestamp)."', 'Y' )";
+		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_number`, `mq_time_start`, `mq_status`) VALUES ( '".$action."',  '".$mNum."', '".date("Y-m-d H:i:s", $timestamp)."', 'Y' )";
 //	echo $sqlMessages;
 		$result = $mysqli->query($sqlMessages);
 		$mess_id = $mysqli->insert_id;
@@ -138,17 +138,45 @@ class Default_Model_Action_Class
 
 		$retData= array('cqIndex'=>$cqIndex, 'number'=> $mNum, 'result'=> 'N') ;
 		
-		$sqlQuery = "SELECT * FROM queue_commands AS cq, api_workflows AS wf, command_routes AS cr, api_destinations as ad WHERE cq.cq_command=cr.cr_action AND cr.cr_index=wf.wf_cr_index AND wf.wf_ad_index=ad.ad_index AND wf.wf_step= 1 + cq.cq_wf_step AND cq.cq_index='".$cqIndex."'";
+		$sqlQuery = "SELECT * FROM queue_commands AS cq, api_workflows AS wf, command_routes AS cr, api_destinations as ad WHERE cq.cq_command=cr.cr_action AND cr.cr_index=wf.wf_cr_index AND wf.wf_ad_index=ad.ad_index AND wf.wf_step = 1 + cq.cq_wf_step AND cq.cq_index='".$cqIndex."'";
 // echo $sqlQuery;
 		$result5 = $mysqli->query($sqlQuery);
 		$row5 = $result5->fetch_object();
 
 // echo $row5->wf_command." , ".$row5->ad_url." , ".$mArr." , ".$mNum;
-		$postRetData=$outObj->message_send($row5->wf_command,$row5->ad_url, $mArr, $mNum);
+		$postRetData=$outObj->message_send_next_command($row5->wf_command,$row5->ad_url, $cqIndex,  $row5->cq_mq_index, $row5->wf_step, $mArr, $mNum);
 // print_r($postRetData);
 		if ($postRetData['status']=='Y') $retData['result']='Y';
 		$retData['debug']=$postRetData;
 		return $retData;
+	}
+
+
+	public function doMessageCompletion($mqIndex)
+	{
+		global $mysqli, $outObj;
+		
+		$sqlQuery6 = "SELECT count(cq.cq_index) AS num, mq.mq_number FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$mqIndex."' AND cq.cq_status='Y'";
+// $query = $sqlQuery1;
+		$result6 = $mysqli->query($sqlQuery6);
+		if ($result6->num_rows!=0) {
+			$row6 = $result6->fetch_object();
+			if ($row6->num==$row6->mq_number) {
+				$sqlQuery2 = "UPDATE `queue_messages` SET `mq_update` = '".date("Y-m-d H:i:s", time())."' ,`mq_status`= 'Y' where mq_index='".$mqIndex."' ";
+				$result2 = $mysqli->query($sqlQuery2);
+				$sqlQuery3 = "SELECT * FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$mqIndex."'";
+//	echo $sqlQuery3;
+				$result3 = $mysqli->query($sqlQuery3);
+				$i=1;
+				while(	$row3 = $result3->fetch_object()){
+					$r_data[]= unserialize($row3->cq_result); 
+					$i++;
+				}
+				
+//				$result=$outObj->message_send($row0->cr_callback, $row0->ad_url, serialize($r_data), $i);
+			}
+		}
+
 	}
 
 	public function doTransferFileToMediaServer($mArr,$mNum,$cqIndex)
@@ -164,6 +192,14 @@ class Default_Model_Action_Class
 	public function doTransferFolderToMediaServer($mArr,$mNum,$cqIndex)
 	{
 		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'success/fail') ;
+
+		return $retData;
+	}
+
+
+	public function doMediaMoveFile($mArr,$mNum,$cqIndex)
+	{
+		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'N') ;
 
 		return $retData;
 	}
