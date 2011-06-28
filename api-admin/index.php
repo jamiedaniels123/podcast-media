@@ -26,7 +26,7 @@ if ($dataMess[1]!='') {
 	
 	$dataObj = new Default_Model_Action_Class($mysqli,$outObj,$apiName);	
 
-	$sqlQuery = "SELECT * FROM command_routes AS cr, api_destinations as ad where cr.cr_destination=ad.ad_name AND cr.cr_action = '".$data['command']."'";
+	$sqlQuery = "SELECT * FROM command_routes AS cr WHERE cr.cr_action = '".$data['command']."'";
 
 // echo 	$sqlQuery;
 	$result = $mysqli->query($sqlQuery);
@@ -36,24 +36,22 @@ if ($dataMess[1]!='') {
 
 // Put command message on message queue and data for each request on the command queue
 
-		$m_data[] = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
-
+		$m_data = $dataObj->queueAction($data['data'],$data['number'],$data['command'],$data['timestamp']);
 // Do anything now which needs to be done directly	
 
-//		$m_data[] = $dataObj->directAction($data['command']);
-
+		$r_data = $dataObj->directAction($data['command'],$m_data['mqIndex'], 'direct');
 //		$m_data[] = array('status'=>'ACK', 'data'=>'Command sent to ! '.$row->ad_url, 'timestamp'=>time());
 
 	}else{
-		$m_data[] = array('status'=>'NACK', 'data'=>'Command not known on admin-api !', 'sqlQuery'=>$sqlQuery, 'timestamp'=>time());
+		$m_data = array('status'=>'NACK', 'data'=>'Command not known on admin-api !', 'sqlQuery'=>$sqlQuery, 'timestamp'=>time());
 
 	}
 
 }else{
-	$m_data[] = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
+	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 
 }
-	$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".date("Y-m-d H:i:s", time())."' )";
+	$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_result_data`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".serialize($r_data)."', '".date("Y-m-d H:i:s", time())."' )";
 	$result = $mysqli->query($sqlLogging);
 // echo "mediaUrl-".$row->ad_url;
 // print_r ($m_data);

@@ -76,7 +76,7 @@ class Default_Model_Action_Class
 
 		$retData= array( 'command'=>$action, 'number'=>'', 'data'=>'Queued admin-api!', 'status'=>'', 'timestamp'=>time()) ;
 		$dataArr='';	
-		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_number`, `mq_time_start`, `mq_status`) VALUES ( '".$action."',  '".$mNum."', '".date("Y-m-d H:i:s", $timestamp)."', 'Y' )";
+		$sqlMessages = "INSERT INTO `queue_messages` (`mq_command`, `mq_number`, `mq_time_start`, `mq_status`) VALUES ( '".$action."',  '".$mNum."', '".date("Y-m-d H:i:s", $timestamp)."', 'N' )";
 //	echo $sqlMessages;
 		$result = $mysqli->query($sqlMessages);
 		$mess_id = $mysqli->insert_id;
@@ -84,7 +84,7 @@ class Default_Model_Action_Class
 		$i=0;
 		while (isset($mArr[$i])){
 			if($i!=0) $sqlCommands.= ", ";
-			$sqlCommands.= "('".$action."', '".$mess_id."','".serialize($mArr[$i])."','".date("Y-m-d H:i:s", $timestamp)."', '', 'Y')"; 
+			$sqlCommands.= "('".$action."', '".$mess_id."','".serialize($mArr[$i])."','".date("Y-m-d H:i:s", $timestamp)."', '', 'N')"; 
 			$i++;
 		}
 //	echo $sqlCommands;
@@ -156,26 +156,34 @@ class Default_Model_Action_Class
 	{
 		global $mysqli, $outObj;
 		
-		$sqlQuery6 = "SELECT count(cq.cq_index) AS num, mq.mq_number FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$mqIndex."' AND cq.cq_status='Y'";
+		$result="OK!";
+		
+		$sqlQuery6 = "SELECT count(cq.cq_index) AS num, mq.mq_number, ad.ad_url, cr.cr_callback FROM queue_messages AS mq, queue_commands cq, command_routes AS cr, api_destinations as ad WHERE mq.mq_index=cq.cq_mq_index AND cr.cr_action=mq.mq_command AND cr.cr_source=ad.ad_name AND mq.mq_index = '".$mqIndex."' AND cq.cq_status='Y'";
 // $query = $sqlQuery1;
 		$result6 = $mysqli->query($sqlQuery6);
 		if ($result6->num_rows!=0) {
 			$row6 = $result6->fetch_object();
-			if ($row6->num==$row6->mq_number) {
-				$sqlQuery2 = "UPDATE `queue_messages` SET `mq_update` = '".date("Y-m-d H:i:s", time())."' ,`mq_status`= 'Y' where mq_index='".$mqIndex."' ";
+			if ($row6->num == $row6->mq_number) {
+				$sqlQuery2 = "UPDATE `queue_messages` SET `mq_time_complete` = '".date("Y-m-d H:i:s", time())."' ,`mq_status`= 'Y' where mq_index='".$mqIndex."' ";
 				$result2 = $mysqli->query($sqlQuery2);
 				$sqlQuery3 = "SELECT * FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$mqIndex."'";
-//	echo $sqlQuery3;
 				$result3 = $mysqli->query($sqlQuery3);
-				$i=1;
+				$i=0;
 				while(	$row3 = $result3->fetch_object()){
 					$r_data[]= unserialize($row3->cq_result); 
 					$i++;
 				}
+
+// echo $row6->cr_callback.", ".$row6->ad_url.", ".serialize($r_data).", ".$i;
+				$result=$outObj->message_send($row6->cr_callback, $row6->ad_url, serialize($r_data), $i);
 				
-//				$result=$outObj->message_send($row0->cr_callback, $row0->ad_url, serialize($r_data), $i);
+//				if ($result['status']!='ack') {
+//					$sqlQuery2 = "UPDATE `queue_messages` SET `mq_status`= 'R' where mq_index='".$mqIndex."' ";
+//					$result2 = $mysqli->query($sqlQuery2);
+//				}
 			}
 		}
+		return $result;
 
 	}
 
