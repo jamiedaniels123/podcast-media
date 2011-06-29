@@ -35,9 +35,11 @@ class Default_Model_Output_Class
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
 
-		$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".serialize($postData)."', '".serialize($response)."', '".date("Y-m-d H:i:s", time())."' )";
-		$result = $mysqli->query($sqlLogging);
-
+		if (!isset($response['status']) || $response['status']!='ACK') {
+			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".serialize($postData)."', '".serialize($response)."', '".date("Y-m-d H:i:s", time())."' )";
+			$result = $mysqli->query($sqlLogging);
+		}
+		
 		return $response;
 	} 
 

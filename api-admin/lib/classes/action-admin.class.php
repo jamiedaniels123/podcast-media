@@ -95,15 +95,32 @@ class Default_Model_Action_Class
 		return $retData;
 	}
 
-	public function directAction($action,$mqIndex,$cqCommand)
+	public function doNextAction($mqIndex,$cqCommand)
 	{
 		global $mysqli, $apiName, $error;
 
-		$sqlQuery1 = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cq.cq_command='".$action."' AND cq.cq_mq_index='".$mqIndex."' AND cr.cr_route_type='".$cqCommand."' ";
-// echo $sqlQuery;
-		$result4 = $mysqli->query($sqlQuery1);
-		if (isset($result4->num_rows)) {
+		$toDo = true;
 		
+		while ($toDo == true) {
+			$sqlQuery1 = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cq.cq_mq_index='".$mqIndex."' AND wf.wf_route_type IN (".$cqCommand.") ";
+	// echo $sqlQuery;
+			$result4 = $mysqli->query($sqlQuery1);
+			if ($result4->num_rows>0) {
+			
+	// Process the outstanding actions 
+				$this->processActions($result4);
+			} else {
+				$toDo = false;
+			}
+		}
+		 return array('mqIndex'=>$mqIndex);
+	}
+
+
+	function processActions($result4) {
+
+		global $mysqli, $error;
+
 // Process the outstanding actions 
 			while(	$row = $result4->fetch_object()) { 
 				$function=$row->wf_function;
@@ -117,11 +134,10 @@ class Default_Model_Action_Class
 				$error = $mysqli->info;
 
 			}
-		}
-		 return array('mqIndex'=>$mqIndex);
 	}
 
-	public function doMediaPushFile($mArr,$mNum,$cqIndex)
+
+	function doMediaPushFile($mArr,$mNum,$cqIndex)
 	{
 		global $source, $destination; 
 
@@ -132,7 +148,7 @@ class Default_Model_Action_Class
 		return $retData;
 	}
 
-	public function doPushNextCommand($mArr,$mNum,$cqIndex)
+	function doPushNextCommand($mArr,$mNum,$cqIndex)
 	{
 		global $mysqli, $outObj;
 
@@ -177,10 +193,10 @@ class Default_Model_Action_Class
 // echo $row6->cr_callback.", ".$row6->ad_url.", ".serialize($r_data).", ".$i;
 				$result=$outObj->message_send($row6->cr_callback, $row6->ad_url, serialize($r_data), $i);
 				
-//				if ($result['status']!='ack') {
-//					$sqlQuery2 = "UPDATE `queue_messages` SET `mq_status`= 'R' where mq_index='".$mqIndex."' ";
-//					$result2 = $mysqli->query($sqlQuery2);
-//				}
+				if ($result['status']!='ACK') {
+					$sqlQuery2 = "UPDATE `queue_messages` SET `mq_status`= 'R' where mq_index='".$mqIndex."' ";
+					$result2 = $mysqli->query($sqlQuery2);
+				}
 			}
 		}
 		return $result;
