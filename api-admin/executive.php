@@ -9,6 +9,7 @@
 require_once("./lib/config.php");
 require_once("./lib/classes/action-admin.class.php");
 require_once("./lib/classes/output.class.php");
+require_once("./lib/pstools.inc.php");
 require_once("./cron.php");
 
 ?>
@@ -29,8 +30,8 @@ function submitform()
 
 <body>
 <br /><?PHP  if (isset($reply2)) print_r($reply2);?><br /><br /> 
-<br /><?PHP // if (isset($r_data)) print_r($r_data);?><br /><br /> 
-<br /><?PHP // if (isset($m_data)) print_r($m_data);?><br /><br /> 
+<br /><?PHP  if (isset($r_data)) print_r($r_data);?><br /><br /> 
+<br /><?PHP  if (isset($m_data)) print_r($m_data);?><br /><br /> 
 <br /><?PHP // if (isset($error)) print_r($error);?><br /><br /> 
 <br /><?PHP // if (isset($query)) print_r($query);?><br /><br /> 
  <form action="" method="post" enctype="application/x-www-form-urlencoded" name="action" id="action">

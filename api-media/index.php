@@ -8,7 +8,6 @@
 
 require_once("./lib/config.php");
 require_once("./lib/classes/action-media.class.php");
-//require_once("./lib/classes/output.class.php");
 
 $mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
 
@@ -52,8 +51,10 @@ if ($dataMess[1]!='') {
 	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 
 }
-	$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".date("Y-m-d H:i:s", time())."' )";
-	$result = $mysqli->query($sqlLogging);
+		if (!isset($m_data['status']) || $m_data['status']!='ACK') {
+			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".date("Y-m-d H:i:s", time())."' )";
+			$result = $mysqli->query($sqlLogging);
+		}
 
 echo json_encode($m_data);
 

@@ -12,7 +12,7 @@ require_once("./lib/classes/output.class.php");
 $outObj = new Default_Model_Output_Class();
 
 if (isset($_REQUEST['action_select'])) {
-	
+
 	if ($_REQUEST['action_select'] == 'transcode-media') {
 		$fdata[]= array('collection_id'=>'', 'infile'=>'BSG_4.2.avi', 'outfile'=>'BSG_4.2.avi', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
 //		$fdata[]= array('collection_id'=>'', 'infile'=>'1443_test/1300469084.wmv', 'outfile'=>'1300469084.wmv', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
@@ -20,9 +20,8 @@ if (isset($_REQUEST['action_select'])) {
 		$action=$_REQUEST['action_select'];
 
 	}else if ($_REQUEST['action_select'] == 'transcode-media-and-deliver'){
-		$fdata[]= array('collection_id'=>'', 'fname'=>'firstfile.m4v', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
-		$fdata[]= array('collection_id'=>'', 'fname'=>'secondfile.m4v', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
-		$number=2;
+		$fdata[]= array('workflow'=>'video-wide', 'source_path'=>'1467_testforcharles/', 'filename'=>'12569_BSG_4.2.avi');
+		$number=1;
 		$action=$_REQUEST['action_select'];
 
 

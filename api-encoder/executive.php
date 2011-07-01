@@ -18,7 +18,7 @@ require_once("./lib/classes/output.class.php");
 
 // Get the actions from the queue table
 
-	$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr where cq.cq_command=cr.cr_action AND cq.cq_status = 'N' ORDER BY cq.cq_command";
+	$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr where cq.cq_command=cr.cr_action AND cr.cr_execute='encoder-api' AND cq.cq_status = 'N' ORDER BY cq.cq_command";
 //	echo $sqlQuery;
 	$result = $mysqli->query($sqlQuery);
 	if ($result->num_rows) {

@@ -11,13 +11,14 @@ require_once("./lib/config.php");
 require_once("./lib/classes/action-admin.class.php");
 require_once("./lib/classes/output.class.php");
 
+$r_data= '';
 $mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
 
 $dataStream = file_get_contents("php://input");
 
 $dataMess=explode('=',urldecode($dataStream));
 
-if ($dataMess[1]!='') {
+if (isset($dataMess[1])) {
 
 	$data=json_decode($dataMess[1],true);
 //print_r($data);

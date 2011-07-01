@@ -8,25 +8,23 @@
 
 require_once("./lib/config.php");
 require_once("./lib/classes/action-encoder.class.php");
-require_once("./lib/classes/output.class.php");
+
+$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
 
 $dataStream = file_get_contents("php://input");
 
 $dataMess=explode('=',urldecode($dataStream));
-// print_r($dataMess[1]);
 
 if ($dataMess[1]!='') {
 
 	$data=json_decode($dataMess[1],true);
 //print_r($data);
 
-	$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
+//	$outObj = new Default_Model_Output_Class();
 
-	$outObj = new Default_Model_Output_Class();
+	$dataObj = new Default_Model_Action_Class($mysqli);	
 
-	$dataObj = new Default_Model_Action_Class($mysqli,$outObj);	
-
-	$sqlQuery = "SELECT * FROM command_routes AS cr where cr.cr_action = '".$data['command']."'";
+	$sqlQuery = "SELECT * FROM command_routes AS cr WHERE cr.cr_action = '".$data['command']."'";
 
 // echo 	$sqlQuery;
 	$result = $mysqli->query($sqlQuery);
@@ -35,26 +33,29 @@ if ($dataMess[1]!='') {
 	if ($result->num_rows) {
 
 		if ($row->cr_route_type=='queue'){
-			$m_data = $dataObj->queueAction($data['data'], $data['number'], $data['command'], $data['timestamp']);
-//			$m_data = array('status'=>'ACK', 'data'=>'Queue action requested', 'timestamp'=>time());
+			$m_data = $dataObj->queueAction($data['data'],$data['command'],$data['cqIndex'],$data['mqIndex'],$data['step'],$data['timestamp']);
+//			$m_data = array('status'=>'ACK', 'data'=>$data['data'], 'timestamp'=>time());
 		
 		}else if ($row->cr_route_type=='direct'){
-			$m_data = $dataObj->directAction($data['data'], $data['number'], $data['command'], $row->cr_function, $data['timestamp']);
+			$m_data = $dataObj->doDirectAction($row->cr_function,$data['data']);
 //			$m_data = array('status'=>'ACK', 'data'=>'Direct action requested', 'timestamp'=>time());
-		
+
 		}
 
 	}else{
 		$m_data = array('status'=>'NACK', 'data'=>'Command not known!', 'timestamp'=>time());
-
 	}
+	
 
 }else{
 	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 
 }
+		if (!isset($m_data['status']) || $m_data['status']!='ACK') {
+			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".urldecode($dataStream)."', '".serialize($m_data)."', '".date("Y-m-d H:i:s", time())."' )";
+			$result = $mysqli->query($sqlLogging);
+		}
 
-$jsonData = json_encode($m_data);
-echo $jsonData;
+echo json_encode($m_data);
 
 ?>

@@ -99,32 +99,23 @@ class Default_Model_Action_Class
 	{
 		global $mysqli, $apiName, $error;
 
-		$toDo = true;
-		
-		while ($toDo == true) {
+		for ( $i = 0; $i <= 4; $i++) {
 			$sqlQuery1 = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cq.cq_mq_index='".$mqIndex."' AND wf.wf_route_type IN (".$cqCommand.") ";
-	// echo $sqlQuery;
+//	 echo $sqlQuery1;
 			$result4 = $mysqli->query($sqlQuery1);
-			if ($result4->num_rows>0) {
-			
-	// Process the outstanding actions 
-				$this->processActions($result4);
-			} else {
-				$toDo = false;
-			}
+			if ($result4->num_rows >= 1) $this->processActions($result4);
 		}
 		 return array('mqIndex'=>$mqIndex);
 	}
 
-
-	function processActions($result4) {
+	function processActions($resultObj) {
 
 		global $mysqli, $error;
 
 // Process the outstanding actions 
-			while(	$row = $result4->fetch_object()) { 
+			while(	$row = $resultObj->fetch_object()) { 
 				$function=$row->wf_function;
-//				if ($row->cq_result!='') $retData = unserialize($row->cq_result);
+print_r($function);
 // Call the action with the data
  				$retData = $this->$function(unserialize($row->cq_data),1,$row->cq_index);
 				if ($row->wf_steps > $row->wf_step && $retData['result']=='Y') $step=$row->wf_step +1; else $step=$row->wf_step;
@@ -135,7 +126,6 @@ class Default_Model_Action_Class
 
 			}
 	}
-
 
 	function doMediaPushFile($mArr,$mNum,$cqIndex)
 	{
@@ -167,7 +157,6 @@ class Default_Model_Action_Class
 		return $retData;
 	}
 
-
 	public function doMessageCompletion($mqIndex)
 	{
 		global $mysqli, $outObj;
@@ -175,7 +164,7 @@ class Default_Model_Action_Class
 		$result="OK!";
 		
 		$sqlQuery6 = "SELECT count(cq.cq_index) AS num, mq.mq_number, ad.ad_url, cr.cr_callback FROM queue_messages AS mq, queue_commands cq, command_routes AS cr, api_destinations as ad WHERE mq.mq_index=cq.cq_mq_index AND cr.cr_action=mq.mq_command AND cr.cr_source=ad.ad_name AND mq.mq_index = '".$mqIndex."' AND cq.cq_status='Y'";
-// $query = $sqlQuery1;
+// echo $sqlQuery6;
 		$result6 = $mysqli->query($sqlQuery6);
 		if ($result6->num_rows!=0) {
 			$row6 = $result6->fetch_object();
@@ -201,31 +190,6 @@ class Default_Model_Action_Class
 		}
 		return $result;
 
-	}
-
-	public function doTransferFileToMediaServer($mArr,$mNum,$cqIndex)
-	{
-		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '', 'scp'=>'', 'number'=> $mNum, 'result'=> 'N') ;
-
-		echo "doTransferFileToMediaServer";
-
-		return $retData;
-		
-	}
-
-	public function doTransferFolderToMediaServer($mArr,$mNum,$cqIndex)
-	{
-		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'success/fail') ;
-
-		return $retData;
-	}
-
-
-	public function doMediaMoveFile($mArr,$mNum,$cqIndex)
-	{
-		$retData= array('cqIndex'=>$cqIndex, 'infile'=> '', 'outfile'=> '','number'=> $mNum, 'result'=> 'N') ;
-
-		return $retData;
 	}
 
 }

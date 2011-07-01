@@ -31,11 +31,4 @@ date_default_timezone_set("Europe/London");
   	'encoder' => '/Volumes/Data/Episode/EpisodeEngine/Inputs/'
   );
 
-
-		$adminUrl="http://podcast-admin-dev.open.ac.uk/admin.php";
-		$adminAPI="http://podcast-admin-dev.open.ac.uk/";
-//		$adminUrl="http://localhost/admin.php";
-		$mediaUrl="http://podcast-admin-dev.open.ac.uk/";
-//		$mediaUrl="http://localhost/";
-
 ?>
