@@ -41,7 +41,7 @@ if (isset($dataMess[1])) {
 // Do anything now which needs to be done directly	
 
 		$cqCommand="'direct'";
-		$r_data = $dataObj->doNextAction($data['command'],$m_data['mqIndex'], $cqCommand);
+		$r_data = $dataObj->doNextAction($m_data['mqIndex'], $cqCommand);
 //		$m_data[] = array('status'=>'ACK', 'data'=>'Command sent to ! '.$row->ad_url, 'timestamp'=>time());
 
 	}else{
@@ -53,7 +53,7 @@ if (isset($dataMess[1])) {
 	$m_data = array('status'=>'NACK', 'data'=>'No request values set!', 'timestamp'=>time());
 
 }
-	$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_result_data`, `al_timestamp`) VALUES ( '".serialize($dataMess)."', '".serialize($m_data)."', '".serialize($r_data)."', '".date("Y-m-d H:i:s", time())."' )";
+	$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_result_data`, `al_source_ip`,`al_timestamp`) VALUES ( '".$dataMess[1]."', '".serialize($m_data)."', '".serialize($r_data)."', '','".date("Y-m-d H:i:s", time())."' )";
 	$result = $mysqli->query($sqlLogging);
 // echo "mediaUrl-".$row->ad_url;
 // print_r ($m_data);

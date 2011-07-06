@@ -8,29 +8,8 @@
 
 require_once("./lib/config.php");
 require_once("./lib/classes/action-encoder.class.php");
-require_once("./lib/classes/output.class.php");
+require_once("./cron.php");
 
-// Initialise objects
-
-	$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
-	$dataObj = new Default_Model_Action_Class($mysqli);	
-	$outObj = new Default_Model_Output_Class();
-
-// Get the actions from the queue table
-
-	$sqlQuery = "SELECT * FROM queue_commands AS cq, command_routes AS cr where cq.cq_command=cr.cr_action AND cr.cr_execute='encoder-api' AND cq.cq_status = 'N' ORDER BY cq.cq_command";
-//	echo $sqlQuery;
-	$result = $mysqli->query($sqlQuery);
-	if ($result->num_rows) {
-	
-// Process the outstanding actions 
-		while(	$row = $result->fetch_object()) { 
-			$function=$row->cr_function;
-			$m_data[] = $dataObj->execAction( unserialize($row->cq_data), $row->cq_index, $function, time());					
-		}
-	}
-
-// Report the status of completed tasks
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -48,13 +27,13 @@ function submitform()
 </head>
 
 <body>
-
 <br /><?PHP if (isset($m_data)) print_r($m_data);?><br /><br /> 
+<br /><?PHP if (isset($error)) print_r($error);?><br /><br /> 
  <form action="" method="post" enctype="application/x-www-form-urlencoded" name="action" id="action">
  
  <select name="action_select" onchange="javascript:submitform();">
  <option value="">Select action ...</option>
- <option value="execute">Execute items in queue</option>
+ <option value="execute">Execute items in admin queue</option>
  </select>
  
  </form>

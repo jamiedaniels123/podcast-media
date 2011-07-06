@@ -95,16 +95,17 @@ class Default_Model_Action_Class
 		return $retData;
 	}
 
-	public function doNextAction($mqIndex,$cqCommand)
-	{
+	public function doNextAction($mqIndex,$cqCommand){
+		
 		global $mysqli, $apiName, $error;
 
-		for ( $i = 0; $i <= 4; $i++) {
-			$sqlQuery1 = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND cr.cr_execute='".$apiName."' AND cq.cq_status = 'N' AND cq.cq_mq_index='".$mqIndex."' AND wf.wf_route_type IN (".$cqCommand.") ";
+//		for ( $i = 0; $i <= 4; $i++) {
+			$sqlQuery1 = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND  cq.cq_status = 'N' AND cq.cq_mq_index='".$mqIndex."' AND wf.wf_route_type IN (".$cqCommand.") ";
+			// cr.cr_execute='".$apiName."' AND
 //	 echo $sqlQuery1;
 			$result4 = $mysqli->query($sqlQuery1);
 			if ($result4->num_rows >= 1) $this->processActions($result4);
-		}
+//		}
 		 return array('mqIndex'=>$mqIndex);
 	}
 
@@ -115,7 +116,7 @@ class Default_Model_Action_Class
 // Process the outstanding actions 
 			while(	$row = $resultObj->fetch_object()) { 
 				$function=$row->wf_function;
-print_r($function);
+ print_r($function);
 // Call the action with the data
  				$retData = $this->$function(unserialize($row->cq_data),1,$row->cq_index);
 				if ($row->wf_steps > $row->wf_step && $retData['result']=='Y') $step=$row->wf_step +1; else $step=$row->wf_step;
@@ -145,15 +146,18 @@ print_r($function);
 		$retData= array('cqIndex'=>$cqIndex, 'number'=> $mNum, 'result'=> 'N') ;
 		
 		$sqlQuery = "SELECT * FROM queue_commands AS cq, api_workflows AS wf, command_routes AS cr, api_destinations as ad WHERE cq.cq_command=cr.cr_action AND cr.cr_index=wf.wf_cr_index AND wf.wf_ad_index=ad.ad_index AND wf.wf_step = 1 + cq.cq_wf_step AND cq.cq_index='".$cqIndex."'";
-// echo $sqlQuery;
-		$result5 = $mysqli->query($sqlQuery);
+		echo $sqlQuery;
+ 		$result5 = $mysqli->query($sqlQuery);
 		$row5 = $result5->fetch_object();
 
-// echo $row5->wf_command." , ".$row5->ad_url." , ".$mArr." , ".$mNum;
-		$postRetData=$outObj->message_send_next_command($row5->wf_command,$row5->ad_url, $cqIndex,  $row5->cq_mq_index, $row5->wf_step, $mArr, $mNum);
+// echo $row5->wf_command.",  ".$row5->ad_url.", ".$cqIndex.",  ".$row5->cq_mq_index.", ".$row5->wf_step.", ";
+// print_r($mArr);
+// echo ", ".$mNum;
+		$postRetData=$outObj->message_send_next_command($row5->wf_command,  $row5->ad_url, $cqIndex,  $row5->cq_mq_index, $row5->wf_step, $mArr, $mNum);
 // print_r($postRetData);
 		if ($postRetData['status']=='Y') $retData['result']='Y';
 		$retData['debug']=$postRetData;
+print_r($postRetData);
 		return $retData;
 	}
 
@@ -161,15 +165,16 @@ print_r($function);
 	{
 		global $mysqli, $outObj;
 		
-		$result="OK!";
+		$result="Checking - ".$mqIndex;
 		
 		$sqlQuery6 = "SELECT count(cq.cq_index) AS num, mq.mq_number, ad.ad_url, cr.cr_callback FROM queue_messages AS mq, queue_commands cq, command_routes AS cr, api_destinations as ad WHERE mq.mq_index=cq.cq_mq_index AND cr.cr_action=mq.mq_command AND cr.cr_source=ad.ad_name AND mq.mq_index = '".$mqIndex."' AND cq.cq_status='Y'";
-// echo $sqlQuery6;
+ echo $sqlQuery6;
 		$result6 = $mysqli->query($sqlQuery6);
 		if ($result6->num_rows!=0) {
 			$row6 = $result6->fetch_object();
 			if ($row6->num == $row6->mq_number) {
 				$sqlQuery2 = "UPDATE `queue_messages` SET `mq_time_complete` = '".date("Y-m-d H:i:s", time())."' ,`mq_status`= 'Y' where mq_index='".$mqIndex."' ";
+// echo $sqlQuery2;
 				$result2 = $mysqli->query($sqlQuery2);
 				$sqlQuery3 = "SELECT * FROM queue_messages AS mq, queue_commands cq WHERE mq.mq_index=cq.cq_mq_index AND mq.mq_index = '".$mqIndex."'";
 				$result3 = $mysqli->query($sqlQuery3);
@@ -180,12 +185,17 @@ print_r($function);
 				}
 
 // echo $row6->cr_callback.", ".$row6->ad_url.", ".serialize($r_data).", ".$i;
-				$result=$outObj->message_send($row6->cr_callback, $row6->ad_url, serialize($r_data), $i);
-				
-				if ($result['status']!='ACK') {
-					$sqlQuery2 = "UPDATE `queue_messages` SET `mq_status`= 'R' where mq_index='".$mqIndex."' ";
-					$result2 = $mysqli->query($sqlQuery2);
-				}
+//				$result=$outObj->message_send($row6->cr_callback, $row6->ad_url, $r_data, $i);
+//$result['status'] = "ACK";				
+//				if ($result['status'] == "ACK") {
+					$sqlQuery8 = "UPDATE `queue_messages` SET `mq_status`= 'C' where mq_index='".$mqIndex."' ";
+					$result8 = $mysqli->query($sqlQuery8);					
+					$sqlQuery9 = "UPDATE `queue_commands` SET `cq_status`= 'C' where cq_mq_index='".$mqIndex."' AND `cq_status`='Y' ";
+					$result9 = $mysqli->query($sqlQuery9);					
+//				} else {
+//					$sqlQuery7 = "UPDATE `queue_messages` SET `mq_status`= 'R' where mq_index='".$mqIndex."' ";
+//					$result7 = $mysqli->query($sqlQuery7);
+//				}
 			}
 		}
 		return $result;

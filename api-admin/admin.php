@@ -9,6 +9,8 @@
 require_once("./lib/config0.php");
 require_once("./lib/classes/output.class.php");
 
+$mysqli = new mysqli($dbLogin['dbhost'], $dbLogin['dbusername'], $dbLogin['dbuserpass'], $dbLogin['dbname']);
+
 $outObj = new Default_Model_Output_Class();
 
 if (isset($_REQUEST['action_select'])) {

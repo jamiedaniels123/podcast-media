@@ -31,12 +31,12 @@ class Default_Model_Output_Class
 		global $mysqli, $error;
 		
 		$postData=array(	'command'=>$command, 'number'=>$number, 'data'=>$data, 'timestamp'=>time());
-//		print_r($postData);
+		$messData=json_encode($postData);
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
 
-		if (($command!='' && $command!='poll') || (isset($response['status']) && $response['status']!='' && $response['status']!='ACK')) {
-			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".serialize($postData)."', '".serialize($response)."', '".date("Y-m-d H:i:s", time())."' )";
+		if (($command!='' && $command!='poll-media' && $command!='poll-encoder') || (isset($response['status']) && $response['status']!='' && $response['status']!='ACK')) {
+			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".$messData."', '".serialize($response)."', '".date("Y-m-d H:i:s", time())."' )";
 			$result = $mysqli->query($sqlLogging);
 		}
 		
