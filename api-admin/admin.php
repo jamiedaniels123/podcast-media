@@ -22,10 +22,10 @@ if (isset($_REQUEST['action_select'])) {
 		$action=$_REQUEST['action_select'];
 
 	}else if ($_REQUEST['action_select'] == 'transcode-media-and-deliver'){
-		$fdata[]= array('workflow'=>'video-wide', 'source_path'=>'1467_testforcharles/', 'filename'=>'12569_BSG_4.2.avi');
+		$fdata[]= array('collection_id'=>'', 'infile'=>'BSG_4.2.avi', 'outfile'=>'BSG_4.2.avi', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
+//		$fdata[]= array('collection_id'=>'', 'infile'=>'1443_test/1300469084.wmv', 'outfile'=>'1300469084.wmv', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
 		$number=1;
 		$action=$_REQUEST['action_select'];
-
 
 	}else if ($_REQUEST['action_select'] == 'transfer-file-to-media-server'){
 		$fdata[]= array('collection_id'=>'', 'infile'=>'dd205-globalised-world-rss2.xml', 'outfile'=>'dd205-globalised-world-rss2.xml', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');

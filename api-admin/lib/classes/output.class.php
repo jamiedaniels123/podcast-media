@@ -31,23 +31,34 @@ class Default_Model_Output_Class
 		global $mysqli, $error;
 		
 		$postData=array(	'command'=>$command, 'number'=>$number, 'data'=>$data, 'timestamp'=>time());
+		print_r($postData);
+		echo $mediaUrl;
 		$messData=json_encode($postData);
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
 
-		if (($command!='' && $command!='poll-media' && $command!='poll-encoder') || (isset($response['status']) && $response['status']!='' && $response['status']!='ACK')) {
-			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_timestamp`) VALUES ( '".$messData."', '".serialize($response)."', '".date("Y-m-d H:i:s", time())."' )";
+		if ((isset($command) && $command!='poll-media' && $command!='poll-encoder') || (isset($response['status']) && $response['status'] =='NACK')) {
+			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_dest`, `al_timestamp`) VALUES ( '".$messData."', '".serialize($response)."', '".$mediaUrl."', '".date("Y-m-d H:i:s", time())."' )";
 			$result = $mysqli->query($sqlLogging);
 		}
 		
 		return $response;
 	} 
 
+	
 	function message_send_next_command($command, $mediaUrl, $cqIndex, $mqIndex, $step, $mArr, $mNum){
+		
+		global $mysqli, $error;
+		
 		$postData=array(	'command'=>$command, 'number'=>$mNum, 'data'=>$mArr, 'cqIndex'=>$cqIndex,  'mqIndex'=>$mqIndex, 'step'=>$step, 'timestamp'=>time());
 //		print_r($postData);
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
+
+		if ((isset($command) && $command!='') || (isset($response['status']) && $response['status'] !='')) {
+			$sqlLogging = "INSERT INTO `api_log` (`al_message`, `al_reply`, `al_dest`, `al_timestamp`) VALUES ( '".$messData."', '".serialize($response)."', '".$mediaUrl."', '".date("Y-m-d H:i:s", time())."' )";
+			$result = $mysqli->query($sqlLogging);
+		}
 
 		return $response;
 	} 
