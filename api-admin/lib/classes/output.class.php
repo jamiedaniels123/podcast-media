@@ -31,8 +31,8 @@ class Default_Model_Output_Class
 		global $mysqli, $error;
 		
 		$postData=array(	'command'=>$command, 'number'=>$number, 'data'=>$data, 'timestamp'=>time());
-		print_r($postData);
-		echo $mediaUrl;
+//		print_r($postData);
+//		echo $mediaUrl;
 		$messData=json_encode($postData);
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
@@ -52,6 +52,7 @@ class Default_Model_Output_Class
 		
 		$postData=array(	'command'=>$command, 'number'=>$mNum, 'data'=>$mArr, 'cqIndex'=>$cqIndex,  'mqIndex'=>$mqIndex, 'step'=>$step, 'timestamp'=>time());
 //		print_r($postData);
+		$messData=json_encode($postData);
 		$postData=array('mess'=>json_encode($postData));
 		$response=$this->rest_helper($mediaUrl, $postData, 'POST', 'json');
 
@@ -91,7 +92,7 @@ class Default_Model_Output_Class
 		}
 		
 		if ($res === false) {
-			throw new Exception("$verb $url failed: $php_errormsg");
+//			throw new Exception("$verb $url failed: $php_errormsg");
 		}
 		
 		switch ($format) {
@@ -100,7 +101,8 @@ class Default_Model_Output_Class
  		  $r = json_decode($res,true);
 
 		  if ($r === null) {
-			throw new Exception("failed to decode $res as json");
+			  $r['status']='NACK';
+//			throw new Exception("failed to decode $res as json");
 		  }
 		  return $r;
 		

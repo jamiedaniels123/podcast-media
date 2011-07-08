@@ -144,16 +144,15 @@ class Default_Model_Action_Class
 		global $mysqli, $outObj;
 
 		$retData= array('cqIndex'=>$cqIndex, 'number'=> $mNum, 'result'=> 'N') ;
-		
+		$postRetData['status']='N';
 		$sqlQuery = "SELECT * FROM queue_commands AS cq, api_workflows AS wf, command_routes AS cr, api_destinations as ad WHERE cq.cq_command=cr.cr_action AND cr.cr_index=wf.wf_cr_index AND wf.wf_ad_index=ad.ad_index AND wf.wf_step = 1 + cq.cq_wf_step AND cq.cq_index='".$cqIndex."'";
 //		echo $sqlQuery;
  		$result5 = $mysqli->query($sqlQuery);
 		$row5 = $result5->fetch_object();
 
-// echo $row5->wf_command.",  ".$row5->ad_url.", ".$cqIndex.",  ".$row5->cq_mq_index.", ".$row5->wf_step.", ";
-// print_r($mArr);
-// echo ", ".$mNum;
-		$postRetData=$outObj->message_send_next_command($row5->wf_command,  $row5->ad_url, $cqIndex,  $row5->cq_mq_index, $row5->wf_step, $mArr, $mNum);
+//		if (isset($mArr) && isset($mArr['command']) && $mArr['command']!= '') {
+			$postRetData=$outObj->message_send_next_command($row5->wf_command,  $row5->ad_url, $cqIndex,  $row5->cq_mq_index, $row5->wf_step, $mArr, $mNum);
+//		}
 // print_r($postRetData);
 		if ($postRetData['status']=='Y') $retData['result']='Y';
 		$retData['debug']=$postRetData;
