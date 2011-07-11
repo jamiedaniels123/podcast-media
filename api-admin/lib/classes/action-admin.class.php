@@ -101,7 +101,7 @@ class Default_Model_Action_Class
 
 //		for ( $i = 0; $i <= 4; $i++) {
 			$sqlQuery1 = "SELECT * FROM queue_commands AS cq, command_routes AS cr,api_workflows AS wf WHERE cq.cq_command=cr.cr_action AND wf.wf_cr_index=cr.cr_index AND cq.cq_wf_step=wf.wf_step AND  cq.cq_status = 'N' AND cq.cq_mq_index='".$mqIndex."' AND wf.wf_route_type IN (".$cqCommand.") ";
-			// cr.cr_execute='".$apiName."' AND
+
 //	 echo $sqlQuery1;
 			$result4 = $mysqli->query($sqlQuery1);
 			if ($result4->num_rows >= 1) $this->processActions($result4);
@@ -114,16 +114,18 @@ class Default_Model_Action_Class
 		global $mysqli, $error;
 
 // Process the outstanding actions 
-			while(	$row = $resultObj->fetch_object()) { 
-				$function=$row->wf_function;
-// print_r($function);
-// Call the action with the data
- 				$retData = $this->$function(unserialize($row->cq_data),1,$row->cq_index);
-				if ($row->wf_steps > $row->wf_step && $retData['result']=='Y') $step=$row->wf_step +1; else $step=$row->wf_step;
-				if ($row->wf_steps == $row->wf_step) $status='Y'; else  $status='N';
-				$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$status."', `cq_wf_step`='".$step."', `cq_update`='".date("Y-m-d H:i:s", time())."' WHERE `cq_index`=  '".$row->cq_index."' ";
-				$result = $mysqli->query($sqlQuery);
-				$error = $mysqli->info;
+			while(	$row = $resultObj->fetch_object()) {
+				$cqResult=unserialize($row->cq_result); 
+
+					$function=$row->wf_function;
+//	 print_r($function);
+	// Call the action with the data
+					$retData = $this->$function(unserialize($row->cq_data),1,$row->cq_index);
+					if ($row->wf_steps > $row->wf_step && $retData['result']=='Y') $step=$row->wf_step +1; else $step=$row->wf_step;
+					if ($row->wf_steps == $row->wf_step) $status='Y'; else  $status='N';
+					$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$status."', `cq_wf_step`='".$step."', `cq_update`='".date("Y-m-d H:i:s", time())."' WHERE `cq_index`=  '".$row->cq_index."' ";
+					$result = $mysqli->query($sqlQuery);
+					$error = $mysqli->info;
 
 			}
 	}
@@ -154,7 +156,8 @@ class Default_Model_Action_Class
 			$postRetData=$outObj->message_send_next_command($row5->wf_command,  $row5->ad_url, $cqIndex,  $row5->cq_mq_index, $row5->wf_step, $mArr, $mNum);
 //		}
 // print_r($postRetData);
-		if ($postRetData['status']=='Y') $retData['result']='Y';
+		// if ($postRetData['status']=='ACK') 
+		$retData['result']='Y';
 		$retData['debug']=$postRetData;
 // print_r($postRetData);
 		return $retData;
