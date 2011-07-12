@@ -32,9 +32,7 @@ class Default_Model_Action_Class
 			
 		$cmdline = "/usr/bin/scp -p ".escapeshellcmd($src)." ".escapeshellcmd($dest)." 2>&1";
 //		echo "<p>Transfer cmd line =".$cmdline."</p>\n";  // debug
-		
 		//error_log("Transfer cmd line =".$cmdline);  // debug
-	  
 		exec($cmdline, $out, $code);
 	  
 		return array($code, $out);
@@ -89,7 +87,7 @@ class Default_Model_Action_Class
 		}
 //	echo $sqlCommands;
 		$result = $mysqli->query($sqlCommands);
-		$error = $mysqli->info;
+//		$error .= "queueAcction - ".$mysqli->info;
 		
 		if ($retData!='') {$retData['number']=$i;$retData['status']='ACK'; $retData['mqIndex']=$mess_id;} else {$retData['number']=0;$retData['status']='NACK';}
 		return $retData;
@@ -125,7 +123,7 @@ class Default_Model_Action_Class
 					if ($row->wf_steps == $row->wf_step) $status='Y'; else  $status='N';
 					$sqlQuery="UPDATE `queue_commands` SET `cq_result`='".serialize($retData)."', `cq_status`='".$status."', `cq_wf_step`='".$step."', `cq_update`='".date("Y-m-d H:i:s", time())."' WHERE `cq_index`=  '".$row->cq_index."' ";
 					$result = $mysqli->query($sqlQuery);
-					$error = $mysqli->info;
+//					$error .= "ProcessActions - ".$mysqli->info;
 
 			}
 	}

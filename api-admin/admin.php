@@ -22,12 +22,17 @@ if (isset($_REQUEST['action_select'])) {
 		$action=$_REQUEST['action_select'];
 
 	}else if ($_REQUEST['action_select'] == 'transcode-media-and-deliver'){
-		$fdata[]= array('collection_id'=>'', 'infile'=>'BSG_4.2.avi', 'outfile'=>'BSG_4.2.avi', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
+		$fdata[]= array('workflow'=>'screencast-wide', 'source_path'=>'1485_testpodcastbycharles/', 'filename'=>'12604_Wildlife.wmv', 'count'=>'1');
 //		$fdata[]= array('collection_id'=>'', 'infile'=>'1443_test/1300469084.wmv', 'outfile'=>'1300469084.wmv', 'type'=>'itunes', 'encode'=>'196kbs', 'count'=>'2');
 		$number=1;
 		$action=$_REQUEST['action_select'];
 
 	}else if ($_REQUEST['action_select'] == 'transfer-file-to-media-server'){
+		$fdata[]= array('collection_id'=>'', 'infile'=>'dd205-globalised-world-rss2.xml', 'outfile'=>'dd205-globalised-world-rss2.xml', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
+		$number=1;
+		$action=$_REQUEST['action_select'];
+
+	}else if ($_REQUEST['action_select'] == 'rename-file-on-media-server'){
 		$fdata[]= array('collection_id'=>'', 'infile'=>'dd205-globalised-world-rss2.xml', 'outfile'=>'dd205-globalised-world-rss2.xml', 'type'=>'utube', 'encode'=>'500kbs', 'count'=>'1');
 		$number=1;
 		$action=$_REQUEST['action_select'];
@@ -193,6 +198,7 @@ echo "<br /><br /><b>Returns: </b>";
  <option value="delete-file-on-media-server">D - Delete-file(s)-on-media-server</option>
  <option value="delete-folder-on-media-server">D - Delete-folder-on-media-server</option>
  <option value="update-file-metadata">U - Update-file(s)-metadata</option>
+ <option value="rename-file-on-media-server">U - Rename-file(s)-on-mediaserver</option>
  <option value="update-folder-metadata">U - Update-folder-metadata</option>
  <option value="set-permissions-folder">R - Set-permissions-folder (media-server)</option>
  <option value="check-file-exists">D - Check-file(s)-exists (media-server)</option>

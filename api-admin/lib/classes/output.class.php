@@ -78,8 +78,15 @@ class Default_Model_Output_Class
 		}
 
 		$context = stream_context_create($cparams);
+		$timeout = 3;
+		$old = ini_set('default_socket_timeout', $timeout);
 
 		$fp = fopen($url, 'rb', false, $context);
+
+		ini_set('default_socket_timeout', $old);
+		stream_set_timeout($fp, $timeout);
+		stream_set_blocking($fp, 0);
+
 		if (!$fp) {
 			$res = false;
 		} else {
@@ -93,6 +100,8 @@ class Default_Model_Output_Class
 		
 		if ($res === false) {
 //			throw new Exception("$verb $url failed: $php_errormsg");
+		  	$r['status']='NACK';
+			return $r;
 		}
 		
 		switch ($format) {
