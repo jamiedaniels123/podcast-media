@@ -78,7 +78,7 @@ class Default_Model_Output_Class
 		}
 
 		$context = stream_context_create($cparams);
-		$timeout = 3;
+		$timeout = 5;
 		$old = ini_set('default_socket_timeout', $timeout);
 
 		$fp = fopen($url, 'rb', false, $context);
@@ -101,6 +101,7 @@ class Default_Model_Output_Class
 		if ($res === false) {
 //			throw new Exception("$verb $url failed: $php_errormsg");
 		  	$r['status']='NACK';
+		  	$r['error']='message timeout or response fail';
 			return $r;
 		}
 		
