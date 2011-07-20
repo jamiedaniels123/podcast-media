@@ -29,6 +29,8 @@ function submitform()
 <body>
 <br /><?PHP if (isset($m_data)) print_r($m_data);?><br /><br /> 
 <br /><?PHP if (isset($error)) print_r($error);?><br /><br /> 
+<br /><?PHP  if (isset($debug)) print_r($debug);?><br /><br /> 
+<br /><?PHP  if (isset($error)) print_r($error);?><br /><br /> 
  <form action="" method="post" enctype="application/x-www-form-urlencoded" name="action" id="action">
  
  <select name="action_select" onchange="javascript:submitform();">
